@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOLZACLEANER - Admin Panel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.6; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        
+        .login-container { background: #1e293b; padding: 40px; border-radius: 12px; border: 2px solid #14b8a6; max-width: 400px; width: 90%; box-shadow: 0 10px 30px rgba(20, 184, 166, 0.2); }
+        .login-header { text-align: center; margin-bottom: 30px; }
+        .login-header h1 { color: #14b8a6; font-size: 28px; margin-bottom: 10px; }
+        .login-header p { color: #cbd5e1; font-size: 14px; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; color: #cbd5e1; margin-bottom: 8px; font-weight: bold; }
+        .form-group input { width: 100%; padding: 12px; background: #0f172a; border: 2px solid #334155; color: white; border-radius: 6px; font-size: 16px; }
+        .form-group input:focus { outline: none; border-color: #14b8a6; }
+        
+        .btn { padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .btn-primary { background: #14b8a6; color: #0f172a; width: 100%; }
+        .btn-primary:hover { background: #0d9488; transform: translateY(-2px); }
+        
+        .error { color: #ef4444; font-size: 14px; margin-top: 10px; text-align: center; }
+        .success { color: #10b981; font-size: 14px; margin-top: 10px; text-align: center; }
+        
+        .dashboard { display: none; }
+        .dashboard.active { display: block; }
+        
+        .admin-header { background: #1e293b; padding: 20px 30px; border-bottom: 2px solid #14b8a6; display: flex; justify-content: space-between; align-items: center; }
+        .admin-header h2 { color: #14b8a6; }
+        .btn-logout { background: #ef4444; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-logout:hover { background: #dc2626; }
+        
+        .admin-content { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: #1e293b; padding: 20px; border-radius: 8px; border-left: 4px solid #14b8a6; }
+        .stat-card h3 { color: #14b8a6; margin-bottom: 10px; font-size: 14px; }
+        .stat-card .value { font-size: 32px; font-weight: bold; color: #14b8a6; }
+        
+        .appointments-section { background: #1e293b; padding: 30px; border-radius: 8px; }
+        .appointments-section h3 { color: #14b8a6; margin-bottom: 20px; }
+        
+        .appointment-item { background: #0f172a; padding: 15px; margin-bottom: 10px; border-radius: 6px; border-left: 3px solid #14b8a6; }
+        .appointment-item p { margin: 5px 0; font-size: 14px; }
+        .appointment-item strong { color: #14b8a6; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #0f172a; color: #14b8a6; padding: 12px; text-align: left; border-bottom: 2px solid #14b8a6; }
+        td { padding: 12px; border-bottom: 1px solid #334155; }
+        tr:hover { background: #0d3d3a; }
+        
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .status-pending { background: #fbbf24; color: #000; }
+        .status-confirmed { background: #10b981; color: white; }
+        .status-completed { background: #3b82f6; color: white; }
+        
+        .hidden { display: none; }
+        
+        @media (max-width: 768px) {
+            .admin-header { flex-direction: column; gap: 15px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            table { font-size: 12px; }
+            th, td { padding: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN FORM -->
+    <div class="login-container" id="loginForm">
+        <div class="login-header">
+            <h1>🔐 BOLZACLEANER</h1>
+            <p>Admin Panel - Accesso Riservato</p>
+        </div>
+        
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="password">Password Admin:</label>
+                <input type="password" id="password" placeholder="Inserisci password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">🔓 Accedi</button>
+            
+            <div id="loginError" class="error hidden"></div>
+        </form>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="dashboard" id="dashboard">
+        <div class="admin-header">
+            <h2>📊 Admin Panel - BOLZACLEANER</h2>
+            <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+        </div>
+        
+        <div class="admin-content">
+            <!-- STATISTICHE -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>📅 Totale Prenotazioni</h3>
+                    <div class="value" id="totalAppointments">0</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>💰 Totale Incassi (€)</h3>
+                    <div class="value" id="totalRevenue">0€</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>✅ Completate</h3>
+                    <div class="value" id="completedAppointments">0</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>⏳ In Sospeso</h3>
+                    <div class="value" id="pendingAppointments">0</div>
+                </div>
+            </div>
+            
+            <!-- TABELLA PRENOTAZIONI -->
+            <div class="appointments-section">
+                <h3>📋 Elenco Prenotazioni</h3>
+                
+                <div id="appointmentsList"></div>
+                
+                <p id="noAppointments" style="text-align: center; color: #94a3b8; margin-top: 20px;">
+                    Nessuna prenotazione ancora...
+                </p>
+                
+                <div id="appointmentsTable" class="hidden">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>📅 Data</th>
+                                <th>👤 Nome</th>
+                                <th>🏠 Servizio</th>
+                                <th>💰 Prezzo</th>
+                                <th>📞 Telefono</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="appointmentsBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============= SECURITY: Verifica che sia accessibile solo con password corretta =============
+        
+        const ADMIN_PASSWORD = 'bolza2024';
+        const SESSION_KEY = 'bolzacleaner_admin_session';
+        const SESSION_DURATION = 3600000; // 1 ora in millisecondi
+        
+        // Verifica sessione al caricamento
+        window.addEventListener('load', function() {
+            checkSession();
+            loadAppointments();
+        });
+        
+        function checkSession() {
+            const session = localStorage.getItem(SESSION_KEY);
+            if (session) {
+                const sessionTime = parseInt(session);
+                const now = new Date().getTime();
+                
+                if (now - sessionTime < SESSION_DURATION) {
+                    // Sessione valida
+                    showDashboard();
+                } else {
+                    // Sessione scaduta
+                    localStorage.removeItem(SESSION_KEY);
+                    showLoginForm();
+                }
+            } else {
+                showLoginForm();
+            }
+        }
+        
+        function handleLogin(event) {
+            event.preventDefault();
+            const password = document.getElementById('password').value;
+            
+            if (password === ADMIN_PASSWORD) {
+                // Salva sessione
+                localStorage.setItem(SESSION_KEY, new Date().getTime().toString());
+                showDashboard();
+                loadAppointments();
+            } else {
+                // Errore
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.textContent = '❌ Password non corretta!';
+                errorDiv.classList.remove('hidden');
+                document.getElementById('password').value = '';
+            }
+        }
+        
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('dashboard').classList.remove('active');
+        }
+        
+        function showDashboard() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('dashboard').classList.add('active');
+        }
+        
+        function logout() {
+            localStorage.removeItem(SESSION_KEY);
+            showLoginForm();
+            document.getElementById('password').value = '';
+        }
+        
+        // ============= STATISTICHE E APPUNTAMENTI =============
+        
+        function loadAppointments() {
+            const appointments = JSON.parse(localStorage.getItem('bolzaAppointments')) || [];
+            
+            // Calcola statistiche
+            const totalAppointments = appointments.length;
+            const totalRevenue = appointments.reduce((sum, apt) => sum + (parseFloat(apt.total) || 0), 0);
+            const completed = appointments.filter(apt => apt.status === 'completed').length;
+            const pending = appointments.filter(apt => apt.status === 'pending').length;
+            
+            // Aggiorna statistiche
+            document.getElementById('totalAppointments').textContent = totalAppointments;
+            document.getElementById('totalRevenue').textContent = totalRevenue.toFixed(2) + '€';
+            document.getElementById('completedAppointments').textContent = completed;
+            document.getElementById('pendingAppointments').textContent = pending;
+            
+            // Mostra/nascondi tabella
+            if (appointments.length === 0) {
+                document.getElementById('noAppointments').style.display = 'block';
+                document.getElementById('appointmentsTable').classList.add('hidden');
+            } else {
+                document.getElementById('noAppointments').style.display = 'none';
+                document.getElementById('appointmentsTable').classList.remove('hidden');
+                
+                // Popola tabella
+                const tbody = document.getElementById('appointmentsBody');
+                tbody.innerHTML = '';
+                
+                appointments.forEach(apt => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${apt.date || 'N/A'}</td>
+                        <td>${apt.name || 'N/A'}</td>
+                        <td>${apt.service || 'N/A'}</td>
+                        <td>${apt.total ? apt.total + '€' : 'N/A'}</td>
+                        <td>${apt.phone || 'N/A'}</td>
+                        <td>
+                            <span class="status-badge status-${apt.status || 'pending'}">
+                                ${apt.status === 'completed' ? '✅ Completato' : '⏳ In Sospeso'}
+                            </span>
+                        </td>
+                    `;
+                });
+            }
+        }
+        
+        // Refresh statistiche ogni 5 secondi
+        setInterval(loadAppointments, 5000);
+        
+        // Proteggi da accesso diretto senza sessione
+        if (!localStorage.getItem(SESSION_KEY)) {
+            showLoginForm();
+        }
+    </script>
+
+</body>
+</html>
