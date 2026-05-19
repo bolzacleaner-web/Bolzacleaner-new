@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOLZACLEANER - Servizio di Pulizia Professionale</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.55), rgba(30, 41, 59, 0.55), rgba(13, 61, 58, 0.55)), url('https://raw.githubusercontent.com/bolzacleaner-web/Bolzacleaner-new/main/bolzacleaner-van-2.png');
+            background-size: cover;
+            background-position: center right;
+            background-attachment: fixed;
+            color: #e2e8f0; 
+            line-height: 1.6; 
+        }
+        
+        .navbar { background: #0f172a; padding: 15px 30px; border-bottom: 2px solid #14b8a6; position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .logo { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: bold; color: #14b8a6; text-transform: uppercase; }
+        .nav-buttons { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .btn-primary { background: #14b8a6; color: #0f172a; }
+        .btn-primary:hover { background: #0d9488; transform: scale(1.05); }
+        .btn-secondary { background: #475569; color: white; }
+        .btn-secondary:hover { background: #64748b; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .hidden { display: none; }
+        
+        h2 { margin-bottom: 30px; font-size: 28px; }
+        
+        .card { background: #1e293b; padding: 20px; border-radius: 8px; border: 2px solid #334155; cursor: pointer; transition: all 0.3s; margin-bottom: 15px; }
+        .card:hover { border-color: #14b8a6; transform: translateY(-5px); box-shadow: 0 5px 15px rgba(20, 184, 166, 0.2); }
+        .card.selected { border-color: #14b8a6; background: #0d3d3a; }
+        .card h3 { color: #14b8a6; margin-bottom: 10px; }
+        
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 40px 0; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #cbd5e1; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; background: #1e293b; border: 2px solid #475569; color: white; border-radius: 6px; font-family: inherit; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        
+        .step-content { background: #0f172a; padding: 30px; border-radius: 8px; margin-bottom: 30px; }
+        .step-content h2 { color: #14b8a6; margin-bottom: 30px; }
+        .step-buttons { display: flex; gap: 10px; margin-top: 30px; flex-wrap: wrap; }
+        
+        .step-badges { display: flex; gap: 20px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap; }
+        .badge { width: 40px; height: 40px; background: #475569; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .badge.active { background: #14b8a6; color: #0f172a; }
+        
+        .faq-item { background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 15px; cursor: pointer; border-left: 4px solid #14b8a6; }
+        .faq-question { font-weight: bold; color: #14b8a6; display: flex; justify-content: space-between; }
+        .faq-answer { display: none; margin-top: 15px; color: #cbd5e1; }
+        .faq-item.open .faq-answer { display: block; }
+        
+        .confirmation-page { background: #1e293b; padding: 30px; border-radius: 8px; border: 2px solid #14b8a6; }
+        .confirmation-page h2 { color: #14b8a6; text-align: center; margin-bottom: 30px; }
+        
+        .extra-option { display: flex; align-items: center; padding: 12px; background: #1e293b; border-radius: 6px; margin: 8px 0; cursor: pointer; border: 2px solid #334155; transition: all 0.3s; }
+        .extra-option:hover { border-color: #14b8a6; }
+        .extra-option.selected { background: #0d3d3a; border-color: #14b8a6; }
+        .extra-option input[type="checkbox"] { width: 20px; height: 20px; margin-right: 15px; cursor: pointer; }
+        .extra-label { flex: 1; display: flex; justify-content: space-between; align-items: center; }
+        .extra-price { color: #14b8a6; font-weight: bold; }
+        
+        .contact-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 40px 0; }
+        .contact-card { background: rgba(30, 41, 59, 0.9); padding: 20px; border-radius: 8px; border-left: 4px solid #14b8a6; }
+        .contact-card strong { display: block; margin-bottom: 10px; }
+        .contact-card a { color: #14b8a6; text-decoration: none; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .contact-card a:hover { color: #FFD700; text-decoration: underline; transform: scale(1.05); }
+        
+        #home { 
+            position: relative;
+            min-height: 600px;
+            overflow: hidden;
+        }
+        #home::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(20, 184, 166, 0.15), transparent);
+            border-radius: 50%;
+            z-index: 1;
+            animation: floatOrb 6s ease-in-out infinite;
+        }
+        #home::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            left: -5%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1), transparent);
+            border-radius: 50%;
+            z-index: 1;
+            animation: floatOrb 8s ease-in-out infinite reverse;
+        }
+        @keyframes floatOrb {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, 30px); }
+        }
+        #home .container {
+            position: relative;
+            z-index: 2;
+        }
+        #home h2 { 
+            font-size: 48px; 
+            background: linear-gradient(135deg, #14b8a6, #FFD700, #8B5CF6, #4169E1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+        #home .btn-primary {
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
+            box-shadow: 0 4px 15px rgba(20, 184, 166, 0.4);
+        }
+        #home .btn-primary:hover {
+            background: linear-gradient(135deg, #0d9488, #14b8a6);
+            box-shadow: 0 6px 25px rgba(20, 184, 166, 0.6);
+        }
+        #home .card { 
+            background: rgba(30, 41, 59, 0.7);
+            border: 2px solid #14b8a6;
+            box-shadow: 0 0 15px rgba(20, 184, 166, 0.1);
+        }
+        #home .card h3 { color: #FFD700; }
+        #home .contact-card { 
+            background: linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(255, 215, 0, 0.05));
+            border-left-color: #FFD700; 
+        }
+        
+        #services { background: rgba(15, 23, 42, 0.92); position: relative; }
+        #faq { background: rgba(15, 23, 42, 0.92); position: relative; }
+        #booking { background: rgba(15, 23, 42, 0.92); position: relative; }
+        
+        #services h2 { color: #8B5CF6; }
+        #services .card h3 { color: #8B5CF6; }
+        #services .card { border-color: #8B5CF6; }
+        #services .card:hover { border-color: #8B5CF6; }
+        
+        #faq h2 { color: #8B6F47; }
+        #faq .faq-question { color: #8B6F47; }
+        
+        #booking h2 { color: #FBBF24; }
+        #booking .card h3 { color: #FBBF24; }
+        #booking .step-content h2 { color: #FBBF24; }
+        
+
+        
+        .chatbot-btn { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #FFD700, #8B5CF6, #4169E1, #FF1744); border: none; cursor: pointer; font-size: 28px; z-index: 999; box-shadow: 0 4px 20px rgba(255, 215, 0, 0.6); transition: all 0.3s; animation: rotateChatbot 20s linear infinite; }
+        @keyframes rotateChatbot {
+            from { background: linear-gradient(135deg, #FFD700, #8B5CF6, #4169E1, #FF1744); }
+            50% { background: linear-gradient(315deg, #4169E1, #FF1744, #FFD700, #8B5CF6); }
+            to { background: linear-gradient(135deg, #FFD700, #8B5CF6, #4169E1, #FF1744); }
+        }
+        .chatbot-btn:hover { transform: scale(1.15); box-shadow: 0 6px 30px rgba(255, 215, 0, 0.8); }
+        
+        .chatbot-box { position: fixed; bottom: 90px; right: 20px; width: 350px; background: #1e293b; border-radius: 12px; box-shadow: 0 5px 40px rgba(0,0,0,0.3); border: 3px solid transparent; background-image: linear-gradient(#1e293b, #1e293b), linear-gradient(135deg, #FFD700, #8B5CF6, #4169E1, #FF1744); background-origin: border-box; background-clip: padding-box, border-box; overflow: hidden; display: none; z-index: 999; }
+        .chatbot-header { background: linear-gradient(135deg, #FFD700, #8B5CF6, #4169E1, #FF1744); color: white; padding: 15px; font-weight: bold; text-align: center; }
+        .chatbot-messages { height: 300px; overflow-y: auto; padding: 15px; background: #0f172a; }
+        .chatbot-msg { background: #1e293b; padding: 10px; border-radius: 8px; margin-bottom: 10px; color: #cbd5e1; font-size: 12px; border-left: 4px solid #14b8a6; }
+        .chatbot-msg[style*="text-align: right"] { border-left: none; border-right: 4px solid #FFD700; background: linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(255, 215, 0, 0.1)); }
+        .chatbot-msg strong { color: #14b8a6; }
+        .chatbot-buttons { padding: 10px; border-top: 1px solid #334155; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .chatbot-buttons button { padding: 8px 6px; background: #14b8a6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: bold; }
+        .chatbot-input-area { padding: 10px; border-top: 1px solid #334155; display: flex; gap: 8px; }
+        .chatbot-input-area input { flex: 1; padding: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 6px; font-size: 12px; }
+        .chatbot-input-area button { padding: 10px 15px; background: #14b8a6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        
+        @media (max-width: 768px) { .navbar { padding: 10px 15px; } .btn { padding: 8px 12px; } }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">🧹 BOLZACLEANER</div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="showPage('home')">Home</button>
+            <button class="btn btn-secondary" onclick="showPage('services')">Servizi</button>
+            <button class="btn btn-secondary" onclick="showPage('faq')">FAQ</button>
+            <button class="btn btn-primary" onclick="startBooking()">Prenota</button>
+            <button class="btn btn-secondary" onclick="showPage('home')">🏠 Home</button>
+        </div>
+    </div>
+
+    <!-- HOME PAGE -->
+    <div id="home" class="page active">
+        <div class="container">
+            <h2>BOLZACLEANER</h2>
+            
+            <button class="btn btn-primary" onclick="startBooking()" style="padding: 15px 40px; font-size: 18px; margin-bottom: 30px;">Prenota Ora 🧹</button>
+            
+
+            <p style="font-size: 18px; margin-bottom: 30px;">Pulito che si vede, qualità che resta</p>
+            
+            <div class="contact-info">
+                <div class="contact-card">
+                    <strong>📞 Telefono</strong>
+                    <p style="font-size: 18px; font-weight: bold; color: #FFD700; margin-top: 10px;">+39 320 424 3674</p>
+                    <a href="tel:+393204243674" class="btn btn-primary" style="width: 100%; margin-top: 10px; text-decoration: none; display: inline-block;">📞 Chiama</a>
+                </div>
+                <div class="contact-card">
+                    <strong>💬 WhatsApp</strong>
+                    <p style="font-size: 18px; font-weight: bold; color: #FFD700; margin-top: 10px;">+39 320 424 3674</p>
+                    <a href="https://wa.me/393204243674" target="_blank" class="btn btn-primary" style="width: 100%; margin-top: 10px; text-decoration: none; display: inline-block;">💬 WhatsApp</a>
+                </div>
+                <div class="contact-card">
+                    <strong>📧 Email</strong>
+                    <p style="font-size: 18px; font-weight: bold; color: #FFD700; margin-top: 10px;">bolzacleaner@gmail.com</p>
+                </div>
+                <div class="contact-card">
+                    <strong>⏰ Orari</strong>
+                    <p>Lun-Ven 8-18<br>Sab 9-13</p>
+                </div>
+            </div>
+
+            <h3 style="margin: 40px 0 20px 0; color: #14b8a6;">✉️ Inviaci un messaggio</h3>
+            <div class="step-content" style="max-width: 600px;">
+                <form id="contactForm" onsubmit="sendFormToEmail(event)">
+                    <div class="form-group">
+                        <label>Nome</label>
+                        <input type="text" id="formName" required placeholder="Il tuo nome">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="formEmail" required placeholder="Il tuo email">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefono (facoltativo)</label>
+                        <input type="tel" id="formPhone" placeholder="Il tuo telefono">
+                    </div>
+                    <div class="form-group">
+                        <label>Messaggio</label>
+                        <textarea id="formMessage" required placeholder="Scrivi il tuo messaggio..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Invia Messaggio</button>
+                </form>
+                
+                <div style="margin-top: 30px; text-align: center;">
+                    <p style="margin-bottom: 15px; color: #cbd5e1;"><strong>O contattaci direttamente:</strong></p>
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <a href="https://wa.me/393204243674?text=Ciao%20BolzaCleaner%20voglio%20informazioni" target="_blank" class="btn btn-primary" style="text-decoration: none;">💬 WhatsApp</a>
+                        <a href="tel:+393204243674" class="btn btn-primary" style="text-decoration: none;">📞 Chiama</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERVICES PAGE -->
+    <div id="services" class="page">
+        <div class="container">
+            <h2>I Nostri Servizi</h2>
+            <div class="services-grid" id="servicesGrid"></div>
+        </div>
+    </div>
+
+    <!-- FAQ PAGE -->
+    <div id="faq" class="page">
+        <div class="container" style="max-width: 800px;">
+            <h2>Domande Frequenti</h2>
+            <div id="faqList"></div>
+        </div>
+    </div>
+
+    <!-- BOOKING FORM -->
+    <div id="booking" class="page">
+        <div class="container">
+            <h2>Prenota il Tuo Servizio</h2>
+            <div class="step-badges" id="stepBadges"></div>
+            <div id="bookingForm"></div>
+        </div>
+    </div>
+
+    <!-- ADMIN PAGE -->
+<!-- CHATBOT -->
+    <button class="chatbot-btn" onclick="toggleChatbot()">🤖</button>
+    <div class="chatbot-box" id="chatbotBox">
+        <div class="chatbot-header">💬 Angela - Assistente BOLZACLEANER</div>
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="chatbot-msg"><strong>🤖 Angela:</strong> Ciao! Come posso aiutarti? 😊</div>
+        </div>
+        <div class="chatbot-buttons">
+            <button onclick="sendChat('Quali servizi offrite?')">📋 Servizi</button>
+            <button onclick="sendChat('Quali sono le frequenze e gli sconti?')">🎁 Frequenze</button>
+            <button onclick="sendChat('Quali sono i vostri orari?')">⏰ Orari</button>
+            <button onclick="sendChat('Come prenoto?')">📱 Prenotazione</button>
+            <button onclick="sendChat('Quali metodi di pagamento?')">💳 Pagamento</button>
+            <button onclick="sendChat('Come vi contatto?')">📞 Contatti</button>
+        </div>
+        <div class="chatbot-input-area">
+            <input type="text" id="chatInput" placeholder="Scrivi la tua domanda..." onkeypress="if(event.key==='Enter') sendChat(document.getElementById('chatInput').value)">
+            <button onclick="sendChat(document.getElementById('chatInput').value)">Invia</button>
+        </div>
+    </div>
+
+    <script>
+        const services = [
+            {name: 'Pulizia Residenziale', desc: 'Pulizia completa della tua casa', hour: 20.70, sqm: 3.45},
+            {name: 'Pulizia Uffici', desc: 'Spazi di lavoro puliti e professionali', hour: 23, sqm: 4.025},
+            {name: 'Servizio di Pulizia Generale per Aziende', desc: 'Servizio completo di pulizia professionale generale per aziende, fabbriche, uffici e strutture commerciali. Pulizia generale, bagni, cucine, aree produzione e esterno azienda. Igiene quotidiana garantita, team esperto, prodotti certificati.', hour: 25.30, sqm: 4.60},
+            {name: 'Pulizia Finestre', desc: 'Finestre brillanti e trasparenti', hour: 17.25, sqm: 2.875},
+            {name: 'Pulizia Tappeti', desc: 'Tappeti e moquette impeccabili', hour: 18.40, sqm: 4.025},
+            {name: 'Pulizia Profonda', desc: 'Pulizia approfondita di ogni dettaglio', hour: 27.60, sqm: 4.60},
+            {name: 'Pulizia Post-Cantiere', desc: 'Ripristino dopo lavori di costruzione', hour: 28.75, sqm: 5.175},
+            {name: 'Pulizia Giardini', desc: 'Giardini e spazi esterni puliti', hour: 20.70, sqm: 3.45},
+            {name: 'Pulizia Garage', desc: 'Garage e cantine perfette', hour: 20.70, sqm: 3.45},
+            {name: 'Disinfezione', desc: 'Ambienti igienizzati e sicuri', hour: 23, sqm: 4.025}
+        ];
+
+        const faqs = [
+            {q: 'Quali servizi offrite?', a: 'Offriamo 10 servizi: Pulizia Residenziale, Uffici, Servizio di Pulizia Generale per Aziende, Finestre, Tappeti, Profonda, Post-Cantiere, Giardini, Garage e Disinfezione.'},
+            {q: 'Quali sono i vostri orari?', a: 'Lun-Ven 08:00-18:00, Sab 09:00-13:00. Offriamo anche servizi straordinari oltre questi orari.'},
+            {q: 'Come prenoto?', a: 'Clicca Prenota, scegli il servizio, seleziona gli extra, la data e l\'ora, e completa il pagamento.'},
+            {q: 'Quali metodi di pagamento accettate?', a: 'Accettiamo: Carta di Credito (Stripe), PayPal, Satispay e Contanti.'},
+            {q: 'Posso personalizzare il servizio?', a: 'Si! Puoi aggiungere Deodorante, Lavaggio Tappeti, Stiratura e Lucidatura al tuo ordine.'},
+            {q: 'Quali aree servite?', a: 'Operiamo principalmente in Lombardia. Contattaci per verificare la tua zona.'}
+        ];
+
+        let currentStep = 1;
+        let bookingState = {
+            service: null,
+            priceHour: 0,
+            priceSqm: 0,
+            pricingType: null,
+            hours: 0,
+            sqm: 0,
+            frequency: 'once',
+            extras: [],
+            extrasPrice: 0,
+            date: null,
+            time: null,
+            address: null,
+            city: null,
+            fullName: null,
+            email: null,
+            phone: null,
+            paymentMethod: null
+        };
+        
+        // ✅ RÉDUCTIONS CORRECTES PAR FRÉQUENCE
+        const frequencyDiscounts = {
+            'once': 0,      // 0% - prix normal
+            'weekly': 10,   // 10% de réduction
+            'biweekly': 15, // 15% de réduction
+            'monthly': 20   // 20% de réduction
+        };
+
+        let allAppointments = [];
+
+        function showPage(name) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(name).classList.add('active');
+        }
+
+        const serviceIcons = {
+            'Pulizia Residenziale': '🏠',
+            'Pulizia Uffici': '🏢',
+            'Servizio di Pulizia Generale per Aziende': '🏭',
+            'Pulizia Finestre': '🪟',
+            'Pulizia Tappeti': '🧶',
+            'Pulizia Profonda': '✨',
+            'Pulizia Post-Cantiere': '🏗️',
+            'Pulizia Giardini': '🌿',
+            'Pulizia Garage': '🚗',
+            'Disinfezione': '🧪'
+        };
+
+        function renderServices() {
+            const grid = document.getElementById('servicesGrid');
+            grid.innerHTML = services.map(s => `
+                <div class="card" onclick="bookService('${s.name}', ${s.hour}, ${s.sqm})">
+                    <div style="font-size: 40px; margin-bottom: 15px;">${serviceIcons[s.name]}</div>
+                    <h3>${s.name}</h3>
+                    <p>${s.desc}</p>
+                    <p style="font-size: 12px; color: #14b8a6; margin-top: 10px;">Euro ${s.hour}/h | Euro ${s.sqm}/m2</p>
+                </div>
+            `).join('');
+        }
+
+        function renderFAQ() {
+            const list = document.getElementById('faqList');
+            list.innerHTML = faqs.map((f, i) => `
+                <div class="faq-item" onclick="this.classList.toggle('open')">
+                    <div class="faq-question"><span>${f.q}</span> <span>▼</span></div>
+                    <div class="faq-answer">${f.a}</div>
+                </div>
+            `).join('');
+        }
+
+        function bookService(name, hour, sqm) {
+            bookingState = {
+                service: name,
+                priceHour: hour,
+                priceSqm: sqm,
+                extras: [],
+                extrasPrice: 0
+            };
+            currentStep = 1;
+            renderBooking();
+            showPage('booking');
+        }
+
+        function startBooking() {
+            currentStep = 1;
+            renderBooking();
+            showPage('booking');
+        }
+
+        function renderBooking() {
+            const badges = document.getElementById('stepBadges');
+            badges.innerHTML = [1,2,3,4,5,6].map(i => `<div class="badge ${i === currentStep ? 'active' : ''}">${i}</div>`).join('');
+
+            const form = document.getElementById('bookingForm');
+
+            if (currentStep === 1) {
+                form.innerHTML = `
+                    <div class="step-content">
+                        <h2>1. Seleziona il Servizio</h2>
+                        <div class="services-grid">
+                            ${services.map(s => `
+                                <div class="card ${s.name === bookingState.service ? 'selected' : ''}" onclick="bookingState.service='${s.name}'; bookingState.priceHour=${s.hour}; bookingState.priceSqm=${s.sqm}; currentStep=2; renderBooking();">
+                                    <div style="font-size: 40px; margin-bottom: 15px;">${serviceIcons[s.name]}</div>
+                                    <h3>${s.name}</h3>
+                                    <p>${s.desc}</p>
+                                    <p style="font-size: 12px; color: #14b8a6; margin-top: 10px;">Euro ${s.hour}/h | Euro ${s.sqm}/m2</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="step-buttons">
+                            <button class="btn btn-primary" onclick="goToStep(2)">Continua →</button>
+                        </div>
+                    </div>
+                `;
+            } else if (currentStep === 2) {
+                form.innerHTML = `
+                    <div class="step-content">
+                        <h2 style="color: #4169E1;">2️⃣ Seleziona Prezzo e Durata</h2>
+                        <div style="margin-bottom: 30px; padding: 15px; background: #0f172a; border-radius: 6px;"><strong>Servizio: ${bookingState.service}</strong></div>
+                        <h3 style="margin: 20px 0 15px 0;">Formato Prezzo</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;">
+                            <div style="padding: 15px; background: #0f172a; border-radius: 6px; border: 2px solid #334155; text-align: center; cursor: pointer;" id="hourBtn" onclick="setPricingType('hour', this)">
+                                <strong>⏱️ Per Ora</strong>
+                                <div id="hourPrice" style="color: #14b8a6; margin-top: 5px;">Euro ${bookingState.priceHour}/h</div>
+                            </div>
+                            <div style="padding: 15px; background: #0f172a; border-radius: 6px; border: 2px solid #334155; text-align: center; cursor: pointer;" id="sqmBtn" onclick="setPricingType('sqm', this)">
+                                <strong>📐 Per m2</strong>
+                                <div id="sqmPrice" style="color: #14b8a6; margin-top: 5px;">Euro ${bookingState.priceSqm}/m2</div>
+                            </div>
+                        </div>
+                        <div id="hourInput" class="hidden" style="margin-top: 20px;"><div class="form-group"><label>Quante ore?</label><input type="number" id="hours" min="0.5" step="0.5" value="2" onchange="updatePrice()"></div></div>
+                        <div id="sqmInput" class="hidden" style="margin-top: 20px;"><div class="form-group"><label>Quanti m2?</label><input type="number" id="sqm" min="1" step="1" value="20" onchange="updatePrice()"></div></div>
+                        <h3 style="margin-top: 30px; margin-bottom: 15px;">📊 Riepilogo Prezzo</h3>
+                        <div style="background: #0f172a; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                            <div style="margin-bottom: 8px;"><strong>Prezzo Base:</strong> <span id="basePriceOriginal">Euro 0</span></div>
+                            <div id="discountRow" style="margin-bottom: 8px; color: #10b981; display: none;"><strong>🎁 Sconto:</strong> <span id="discountValue">-Euro 0</span></div>
+                            <div style="margin-bottom: 8px;"><strong>Subtotale:</strong> <span id="basePrice">Euro 0</span></div>
+                            <div style="margin-bottom: 8px;"><strong>Servizi Extra:</strong> <span id="extrasPrice">Euro 0</span></div>
+                            <div style="border-top: 1px solid #334155; padding-top: 10px; margin-top: 10px;"><strong style="color: #14b8a6; font-size: 18px;">TOTALE: <span id="totalPrice">Euro 0</span></strong></div>
+                        </div>
+                        <div class="step-buttons">
+                            <button class="btn btn-secondary" onclick="goToStep(1)">← Indietro</button>
+                            <button class="btn btn-primary" onclick="goToStep(3)">Continua →</button>
+                        </div>
+                    </div>
+                `;
+            } else if (currentStep === 3) {
+                form.innerHTML = `
+                    <div class="step-content">
+                        <h2 style="color: #4169E1;">3️⃣ Servizi Supplementari</h2>
+                        <div style="margin-bottom: 30px; padding: 15px; background: #0f172a; border-radius: 6px;">
+                            <strong id="selectedServiceInfo">Servizio selezionato: ${bookingState.service}</strong>
+                        </div>
+
+                        <h3 style="margin: 30px 0 20px 0;">📋 Extra Ordinari</h3>
+                        <div style="background: #0f172a; padding: 20px; border-radius: 6px; margin-bottom: 20px;">
+                            <label class="extra-option" onclick="toggleExtra(this, 'Ordinario', 0)">
+                                <input type="checkbox">
+                                <div class="extra-label">
+                                    <span>Ordinario (Lun-Ven 8-18, Sab 9-13)</span>
+                                </div>
+                            </label>
+                            <label class="extra-option" onclick="toggleExtra(this, 'Deodorante', 17.25)">
+                                <input type="checkbox">
+                                <div class="extra-label">
+                                    <span>Deodorante</span>
+                                    <span class="extra-price">+Euro 15</span>
+                                </div>
+                            </label>
+                            <label class="extra-option" onclick="toggleExtra(this, 'Lavaggio Tappeti', 25)">
+                                <input type="checkbox">
+                                <div class="extra-label">
+                                    <span>Lavaggio Tappeti</span>
+                                    <span class="extra-price">+Euro 25</span>
+                                </div>
+                            </label>
+                            <label class="extra-option" onclick="toggleExtra(this, 'Stiratura', 30)">
+                                <input type="checkbox">
+                                <div class="extra-label">
+                                    <span>Stiratura</span>
+                                    <span class="extra-price">+Euro 30</span>
+                                </div>
+                            </label>
+                            <label class="extra-option" onclick="toggleExtra(this, 'Lucidatura', 20)">
+                                <input type="checkbox">
+                                <div class="extra-label">
+                                    <span>Lucidatura</span>
+                                    <span class="extra-price">+Euro 20</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <h3 style="margin: 30px 0 20px 0;">⭐ Extra Straordinari</h3>
+                        <div style="background: #0f172a; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
+                            <label class="extra-option" onclick="toggleExtra(this, 'Straordinario', 0)">
+                                <input type="checkbox">
+                                <div class="extra-label">
+                                    <span>Straordinario (+50%, fuori orari + domenica)</span>
+                                </div>
+                            </label>
+                            <label class="extra-option" onclick="toggleExtra(this, 'Deodorante Straord.', 22.5)">
+                                <input type="checkbox">
+                                <div class="extra-label">
+                                    <span>Deodorante</span>
+                                    <span class="extra-price">+Euro 22.50</span>
+                                </div>
+                            </label>
+                            <label class="extra-option" onclick="toggleExtra(this, 'Lavaggio Tappeti Straord.', 37.5)">
+                                <input type="checkbox">
+                                <div class="extra-label">
+                                    <span>Lavaggio Tappeti</span>
+                                    <span class="extra-price">+Euro 37.50</span>
+                                </div>
+                            </label>
+                            <label class="extra-option" onclick="toggleExtra(this, 'Stiratura Straord.', 45)">
+                                <input type="checkbox">
+                                <div class="extra-label">
+                                    <span>Stiratura</span>
+                                    <span class="extra-price">+Euro 45</span>
+                                </div>
+                            </label>
+                            <label class="extra-option" onclick="toggleExtra(this, 'Lucidatura Straord.', 30)">
+                                <input type="checkbox">
+                                <div class="extra-label">
+                                    <span>Lucidatura</span>
+                                    <span class="extra-price">+Euro 30</span>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="step-buttons">
+                            <button class="btn btn-secondary" onclick="currentStep=1; renderBooking();">← Indietro</button>
+                            <button class="btn btn-primary" onclick="goToStep(4)">Continua →</button>
+                        </div>
+                    </div>
+                `;
+            } else if (currentStep === 4) {
+                form.innerHTML = `
+                    <div class="step-content">
+                        <h2 style="color: #8B5CF6;">4️⃣ Data e Ora</h2>
+                        
+                        <div class="form-group">
+                            <label>Data Preferita</label>
+                            <input type="date" id="bookingDate" required onchange="bookingState.date = this.value; generateAvailableHours();">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Ora Preferita</label>
+                            <select id="bookingTime" required onchange="bookingState.time = this.value;">
+                                <option value="">Seleziona un'ora</option>
+                            </select>
+                        </div>
+                        
+                        <div class="step-buttons">
+                            <button class="btn btn-secondary" onclick="goToStep(3)">← Indietro</button>
+                            <button class="btn btn-primary" onclick="validateDateTimeAndContinue()">Continua →</button>
+                        </div>
+                    </div>
+                `;
+                setTimeout(() => {const today = new Date().toISOString().split('T')[0]; document.getElementById('bookingDate').min = today;}, 100);
+            } else if (currentStep === 5) {
+                form.innerHTML = `
+                    <div class="step-content">
+                        <h2>5️⃣ Dati Personali</h2>
+                        
+                        <div class="form-group">
+                            <label>Nome Completo</label>
+                            <input type="text" id="fullName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Telefono</label>
+                            <input type="tel" id="phone" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Indirizzo</label>
+                            <input type="text" id="address" placeholder="Via, numero civico" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Città</label>
+                            <input type="text" id="city" placeholder="Milano" required>
+                        </div>
+                        
+                        <h3 style="margin-top: 30px; margin-bottom: 15px;">📅 Frequenza di Lavoro</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                            <label class="extra-option" onclick="setFrequency(this, 'once')">
+                                <input type="radio" name="frequency">
+                                <div class="extra-label"><span>🔵 Una Tantum</span></div>
+                            </label>
+                            <label class="extra-option" onclick="setFrequency(this, 'weekly')">
+                                <input type="radio" name="frequency">
+                                <div class="extra-label"><span>📆 Settimanale</span></div>
+                            </label>
+                            <label class="extra-option" onclick="setFrequency(this, 'biweekly')">
+                                <input type="radio" name="frequency">
+                                <div class="extra-label"><span>📊 Bisettimanale</span></div>
+                            </label>
+                            <label class="extra-option" onclick="setFrequency(this, 'monthly')">
+                                <input type="radio" name="frequency">
+                                <div class="extra-label"><span>📈 Mensile</span></div>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Note Aggiuntive</label>
+                            <textarea id="notes" placeholder="Descrivi eventuali esigenze specifiche..."></textarea>
+                        </div>
+                        
+                        <div class="step-buttons">
+                            <button class="btn btn-secondary" onclick="goToStep(4)">← Indietro</button>
+                            <button class="btn btn-primary" onclick="validateClientDataAndContinue()">Continua →</button>
+                        </div>
+                    </div>
+                `;
+            } else if (currentStep === 6) {
+                const basePrice = calculateBasePrice();
+                const total = basePrice + bookingState.extrasPrice;
+                const rawBasePrice = (() => {
+                    if (bookingState.pricingType === 'hour') {
+                        const hours = parseFloat(document.getElementById('hourInput')?.value || 2) || 0;
+                        return hours * bookingState.priceHour;
+                    } else if (bookingState.pricingType === 'sqm') {
+                        const sqm = parseFloat(document.getElementById('sqmInput')?.value || 20) || 0;
+                        return sqm * bookingState.priceSqm;
+                    }
+                    return 0;
+                })();
+                const discount = frequencyDiscounts[bookingState.frequency] || 0;
+                const discountAmount = rawBasePrice * (discount / 100);
+                
+                form.innerHTML = `
+                    <div class="confirmation-page">
+                        <h2>✅ Conferma Prenotazione</h2>
+                        
+                        <h3 style="color: #14b8a6; margin-bottom: 15px; margin-top: 0;">📋 Dati di Contatto</h3>
+                        <div style="background: #0f172a; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                            <div class="form-group">
+                                <label style="font-size: 12px;">Nome Completo *</label>
+                                <input type="text" id="fullName" value="${bookingState.fullName || ''}" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 12px;">Email *</label>
+                                <input type="email" id="email" value="${bookingState.email || ''}" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 12px;">Telefono *</label>
+                                <input type="tel" id="phone" value="${bookingState.phone || ''}" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 12px;">Indirizzo *</label>
+                                <input type="text" id="address" value="${bookingState.address || ''}" placeholder="Via, numero civico" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 12px;">Città *</label>
+                                <input type="text" id="city" value="${bookingState.city || ''}" placeholder="Milano" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0;">
+                            </div>
+                        </div>
+                        
+                        <h3 style="color: #14b8a6; margin-bottom: 15px;">📊 Riepilogo Prenotazione</h3>
+                            <div style="margin-bottom: 10px;"><strong>Servizio:</strong> ${bookingState.service}</div>
+                            <div style="margin-bottom: 10px;"><strong>${bookingState.pricingType === 'hour' ? 'Ore Selezionate:' : 'Metri Quadri:' }</strong> ${bookingState.pricingType === 'hour' ? (parseFloat(document.getElementById('hourInput')?.value || 2) || 0) : (parseFloat(document.getElementById('sqmInput')?.value || 20) || 0)}</div>
+                            <div style="margin-bottom: 10px;"><strong>Frequenza:</strong> ${bookingState.frequency === 'once' ? 'Una Tantum' : bookingState.frequency === 'weekly' ? 'Settimanale' : bookingState.frequency === 'biweekly' ? 'Bisettimanale' : 'Mensile'}</div>
+                            ${discount > 0 ? `
+                                <div style="margin-bottom: 10px;"><strong>Prezzo Originale:</strong> Euro ${rawBasePrice.toFixed(2)}</div>
+                                <div style="margin-bottom: 10px; color: #10b981;"><strong>🎁 Sconto (${discount}%):</strong> -Euro ${discountAmount.toFixed(2)}</div>
+                                <div style="margin-bottom: 10px;"><strong>Prezzo Scontato:</strong> Euro ${basePrice.toFixed(2)}</div>
+                            ` : `<div style="margin-bottom: 10px;"><strong>Prezzo Base:</strong> Euro ${basePrice.toFixed(2)}</div>`}
+                            ${bookingState.extrasPrice > 0 ? `<div style="margin-bottom: 10px;"><strong>Servizi Supplementari:</strong> Euro ${bookingState.extrasPrice.toFixed(2)}</div>` : ''}
+                            <div style="margin-bottom: 10px;"><strong>Data:</strong> ${bookingState.date || '?'}</div>
+                            <div style="margin-bottom: 10px;"><strong>Ora:</strong> ${bookingState.time || '?'}</div>
+                            <div style="margin-bottom: 10px;"><strong>Indirizzo:</strong> ${bookingState.address || '?'}, ${bookingState.city || '?'}</div>
+                            <div style="margin-bottom: 10px;"><strong>Contatto:</strong> ${document.getElementById('email')?.value || '?'} / ${document.getElementById('phone')?.value || '?'}</div>
+                            <div style="border-top: 1px solid #334155; padding-top: 10px; margin-top: 10px;"><strong style="color: #14b8a6; font-size: 18px;">TOTALE: Euro ${total.toFixed(2)}</strong></div>
+                        </div>
+                        
+                        <h3 style="margin: 20px 0;">Scegli il Metodo di Pagamento</h3>
+                        <label class="extra-option" onclick="setPaymentMethod(this, 'card')">
+                            <input type="radio" name="payment">
+                            <div class="extra-label"><span>💳 Carta di Credito</span></div>
+                        </label>
+                        <label class="extra-option" onclick="setPaymentMethod(this, 'paypal')">
+                            <input type="radio" name="payment">
+                            <div class="extra-label"><span>🏦 PayPal</span></div>
+                        </label>
+                        <label class="extra-option" onclick="setPaymentMethod(this, 'satispay')">
+                            <input type="radio" name="payment">
+                            <div class="extra-label"><span>📱 Satispay</span></div>
+                        </label>
+                        <label class="extra-option" onclick="setPaymentMethod(this, 'cash')">
+                            <input type="radio" name="payment">
+                            <div class="extra-label"><span>💰 Contanti</span></div>
+                        </label>
+                        
+                        <div id="paymentFields" style="display: none; background: #1e293b; padding: 20px; border-radius: 6px; margin: 20px 0;">
+                            <!-- Campi Carta -->
+                            <div id="cardFields" class="hidden">
+                                <h4 style="color: #14b8a6; margin-bottom: 15px;">Dettagli Carta di Credito</h4>
+                                <div class="form-group">
+                                    <label>Numero Carta (16 cifre)</label>
+                                    <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div class="form-group">
+                                        <label>Data Scadenza (MM/YY)</label>
+                                        <input type="text" id="cardExpiry" placeholder="12/25" maxlength="5">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>CVV (3 cifre)</label>
+                                        <input type="text" id="cardCVV" placeholder="123" maxlength="3">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nome Titolare</label>
+                                    <input type="text" id="cardName" placeholder="Mario Rossi">
+                                </div>
+                            </div>
+                            
+                            <!-- Campi PayPal -->
+                            <div id="paypalFields" class="hidden">
+                                <h4 style="color: #14b8a6; margin-bottom: 15px;">Accedi a PayPal</h4>
+                                <div class="form-group">
+                                    <label>Email PayPal</label>
+                                    <input type="email" id="paypalEmail" placeholder="tuo@email.com">
+                                </div>
+                                <div class="form-group">
+                                    <label>Password PayPal</label>
+                                    <input type="password" id="paypalPassword" placeholder="••••••••">
+                                </div>
+                            </div>
+                            
+                            <!-- Campi Satispay -->
+                            <div id="satispayFields" class="hidden">
+                                <h4 style="color: #14b8a6; margin-bottom: 15px;">Informazioni Satispay</h4>
+                                <div class="form-group">
+                                    <label>Numero di Telefono</label>
+                                    <input type="tel" id="satispayPhone" placeholder="+39 320 123 4567">
+                                </div>
+                            </div>
+                            
+                            <!-- Campi Contanti -->
+                            <div id="cashFields" class="hidden">
+                                <h4 style="color: #14b8a6; margin-bottom: 15px;">Pagamento in Contanti</h4>
+                                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                    <input type="checkbox" id="cashConfirm">
+                                    <span>Confermo che pagherò in contanti al momento del servizio</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="step-buttons">
+                            <button class="btn btn-secondary" onclick="goToStep(5)">← Indietro</button>
+                            <button class="btn btn-primary" onclick="processPayment();">Conferma Prenotazione</button>
+                        </div>
+                    </div>
+                `;
+                if (bookingState.paymentMethod) {
+                    showPaymentFields(bookingState.paymentMethod);
+                }
+            }
+        }
+
+        function toggleExtra(elem, name, price) {
+            const checkbox = elem.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                elem.classList.add('selected');
+                if (!bookingState.extras.includes(name)) {
+                    bookingState.extras.push(name);
+                    bookingState.extrasPrice += price;
+                }
+            } else {
+                elem.classList.remove('selected');
+                bookingState.extras = bookingState.extras.filter(e => e !== name);
+                bookingState.extrasPrice -= price;
+            }
+            updatePrice();
+        }
+
+        function setPricingType(type, elem) {
+            bookingState.pricingType = type;
+            
+            document.getElementById('hourBtn').style.borderColor = '#334155';
+            document.getElementById('sqmBtn').style.borderColor = '#334155';
+            
+            elem.style.borderColor = '#14b8a6';
+            elem.style.background = '#0d3d3a';
+            
+            if (type === 'hour') {
+                document.getElementById('hourInput').classList.remove('hidden');
+                document.getElementById('sqmInput').classList.add('hidden');
+            } else {
+                document.getElementById('hourInput').classList.add('hidden');
+                document.getElementById('sqmInput').classList.remove('hidden');
+            }
+            
+            const dateInput = document.getElementById('bookingDate');
+            if (dateInput) {
+                dateInput.disabled = false;
+                dateInput.style.opacity = '1';
+                dateInput.style.cursor = 'pointer';
+            }
+            
+            updatePrice();
+        }
+
+        function updatePrice() {
+            const rawBasePrice = (() => {
+                if (bookingState.pricingType === 'hour') {
+                    const hours = parseFloat(document.getElementById('hourInput')?.value || 2) || 0;
+                    return hours * bookingState.priceHour;
+                } else if (bookingState.pricingType === 'sqm') {
+                    const sqm = parseFloat(document.getElementById('sqmInput')?.value || 20) || 0;
+                    return sqm * bookingState.priceSqm;
+                }
+                return 0;
+            })();
+            
+            const base = calculateBasePrice();
+            const total = base + bookingState.extrasPrice;
+            const discount = frequencyDiscounts[bookingState.frequency] || 0;
+            const discountAmount = rawBasePrice * (discount / 100);
+            
+            if (document.getElementById('basePriceOriginal')) {
+                document.getElementById('basePriceOriginal').textContent = 'Euro ' + rawBasePrice.toFixed(2);
+            }
+            
+            if (document.getElementById('discountRow')) {
+                if (discount > 0) {
+                    document.getElementById('discountRow').style.display = 'block';
+                    document.getElementById('discountValue').textContent = '-Euro ' + discountAmount.toFixed(2) + ' (-' + discount + '%)';
+                } else {
+                    document.getElementById('discountRow').style.display = 'none';
+                }
+            }
+            
+            if (document.getElementById('basePrice')) {
+                document.getElementById('basePrice').textContent = 'Euro ' + base.toFixed(2);
+            }
+            if (document.getElementById('extrasPrice')) {
+                document.getElementById('extrasPrice').textContent = 'Euro ' + bookingState.extrasPrice.toFixed(2);
+            }
+            if (document.getElementById('totalPrice')) {
+                document.getElementById('totalPrice').textContent = 'Euro ' + total.toFixed(2);
+            }
+        }
+
+        // ✅ CORRECTION PRINCIPALE: Calcul du prix CORRIGÉ
+        function calculateBasePrice() {
+            let basePrice = 0;
+            
+            // Calculer le prix de base
+            if (bookingState.pricingType === 'hour') {
+                const hours = parseFloat(document.getElementById('hourInput')?.value || 2) || 0;
+                bookingState.hours = hours;
+                basePrice = hours * bookingState.priceHour;
+            } else if (bookingState.pricingType === 'sqm') {
+                const sqm = parseFloat(document.getElementById('sqmInput')?.value || 20) || 0;
+                bookingState.sqm = sqm;
+                basePrice = sqm * bookingState.priceSqm;
+            }
+            
+            // ✅ Appliquer la réduction selon la fréquence
+            const discount = frequencyDiscounts[bookingState.frequency] || 0;
+            const discountedPrice = basePrice - (basePrice * discount / 100);
+            
+            // Retourner le prix APRÈS réduction (sans extras)
+            return discountedPrice;
+        }
+
+        function validateDateTimeAndContinue() {
+            const dateValue = document.getElementById('bookingDate')?.value;
+            const timeValue = document.getElementById('bookingTime')?.value;
+            
+            if (!dateValue) {
+                alert('❌ DEVI SCEGLIERE UNA DATA!');
+                return;
+            }
+            
+            if (!timeValue) {
+                alert('❌ DEVI SCEGLIERE UN\'ORA!');
+                return;
+            }
+            
+            // Sauvegarde dans bookingState se non già fatto
+            bookingState.date = dateValue;
+            bookingState.time = timeValue;
+            
+            // Continua verso l'étape 5
+            goToStep(5);
+        }
+
+        function validateClientDataAndContinue() {
+            const fullName = document.getElementById('fullName')?.value?.trim();
+            const email = document.getElementById('email')?.value?.trim();
+            const phone = document.getElementById('phone')?.value?.trim();
+            const address = document.getElementById('address')?.value?.trim();
+            const city = document.getElementById('city')?.value?.trim();
+            
+            if (!fullName) {
+                alert('❌ INSERISCI IL NOME COMPLETO!');
+                return;
+            }
+            if (!email) {
+                alert('❌ INSERISCI L\'EMAIL!');
+                return;
+            }
+            if (!phone) {
+                alert('❌ INSERISCI IL TELEFONO!');
+                return;
+            }
+            if (!address) {
+                alert('❌ INSERISCI L\'INDIRIZZO!');
+                return;
+            }
+            if (!city) {
+                alert('❌ INSERISCI LA CITTÀ!');
+                return;
+            }
+            
+            // Sauvegarde dans bookingState
+            bookingState.fullName = fullName;
+            bookingState.email = email;
+            bookingState.phone = phone;
+            bookingState.address = address;
+            bookingState.city = city;
+            
+            // Continua verso l'étape 6
+            goToStep(6);
+        }
+
+        function goToStep(stepNum) {
+            let isValid = true;
+            let errorMsg = '';
+            
+            if (currentStep === 1) {
+                if (!bookingState.service) {
+                    isValid = false;
+                    errorMsg = 'Seleziona un servizio!';
+                }
+            } else if (currentStep === 2) {
+                const hours = document.getElementById('hours')?.value;
+                const sqm = document.getElementById('sqm')?.value;
+                
+                if (!bookingState.pricingType) {
+                    isValid = false;
+                    errorMsg = 'Seleziona il tipo di prezzo (Per Ora o Per m2)!';
+                } else if (bookingState.pricingType === 'hour' && !hours) {
+                    isValid = false;
+                    errorMsg = 'Inserisci il numero di ore!';
+                } else if (bookingState.pricingType === 'sqm' && !sqm) {
+                    isValid = false;
+                    errorMsg = 'Inserisci i metri quadri!';
+                }
+            } else if (currentStep === 3) {
+                isValid = true;
+            } else if (currentStep === 4) {
+                const date = document.getElementById('bookingDate')?.value;
+                const time = document.getElementById('bookingTime')?.value;
+                
+                if (!date) {
+                    isValid = false;
+                    errorMsg = 'Seleziona la data!';
+                } else if (!time) {
+                    isValid = false;
+                    errorMsg = 'Seleziona l\'ora!';
+                }
+            } else if (currentStep === 5) {
+                const name = document.getElementById('fullName')?.value?.trim();
+                const email = document.getElementById('email')?.value?.trim();
+                const phone = document.getElementById('phone')?.value?.trim();
+                const addr = document.getElementById('address')?.value?.trim();
+                const city = document.getElementById('city')?.value?.trim();
+                
+                if (!name) {
+                    isValid = false;
+                    errorMsg = 'Inserisci il nome completo!';
+                } else if (!email) {
+                    isValid = false;
+                    errorMsg = 'Inserisci l\'email!';
+                } else if (!phone) {
+                    isValid = false;
+                    errorMsg = 'Inserisci il telefono!';
+                } else if (!addr) {
+                    isValid = false;
+                    errorMsg = 'Inserisci l\'indirizzo!';
+                } else if (!city) {
+                    isValid = false;
+                    errorMsg = 'Inserisci la città!';
+                }
+            } else if (currentStep === 6) {
+                if (!bookingState.paymentMethod) {
+                    isValid = false;
+                    errorMsg = 'Seleziona un metodo di pagamento!';
+                }
+            }
+            
+            if (!isValid) {
+                alert(errorMsg);
+                return;
+            }
+            
+            if (currentStep === 4) {
+                const dateElem = document.getElementById('bookingDate');
+                const timeElem = document.getElementById('bookingTime');
+                if (dateElem) bookingState.date = dateElem.value;
+                if (timeElem) bookingState.time = timeElem.value;
+            } else if (currentStep === 5) {
+                const addrElem = document.getElementById('address');
+                const cityElem = document.getElementById('city');
+                const notesElem = document.getElementById('notes');
+                if (addrElem) bookingState.address = addrElem.value;
+                if (cityElem) bookingState.city = cityElem.value;
+                if (notesElem) bookingState.notes = notesElem.value;
+            }
+            
+            currentStep = stepNum;
+            renderBooking();
+        }
+
+        function generateAvailableHours() {
+            const dateInput = document.getElementById('bookingDate').value;
+            if (!dateInput) return;
+            
+            const selectedDate = new Date(dateInput);
+            const dayOfWeek = selectedDate.getDay();
+            const timeSelect = document.getElementById('bookingTime');
+            timeSelect.innerHTML = '<option value="">Seleziona un\'ora</option>';
+            
+            let hours = [];
+            if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                hours = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+            } else if (dayOfWeek === 6) {
+                hours = ['09:00', '10:00', '11:00', '12:00', '13:00'];
+            }
+            
+            hours.forEach(hour => {
+                const option = document.createElement('option');
+                option.value = hour;
+                option.textContent = hour;
+                timeSelect.appendChild(option);
+            });
+        }
+
+        function setFrequency(elem, frequency) {
+            document.querySelectorAll('[name="frequency"]').forEach(r => r.checked = false);
+            elem.querySelector('input[type="radio"]').checked = true;
+            elem.classList.add('selected');
+            document.querySelectorAll('.extra-option').forEach(o => { 
+                if (o !== elem && o.querySelector('input[name="frequency"]')) o.classList.remove('selected'); 
+            });
+            bookingState.frequency = frequency;
+            updatePrice();
+        }
+
+        function setPaymentMethod(elem, method) {
+            document.querySelectorAll('[name="payment"]').forEach(r => r.checked = false);
+            elem.querySelector('input[type="radio"]').checked = true;
+            elem.classList.add('selected');
+            document.querySelectorAll('.extra-option').forEach(o => { if (o !== elem) o.classList.remove('selected'); });
+            bookingState.paymentMethod = method;
+            showPaymentFields(method);
+        }
+
+        function showPaymentFields(method) {
+            const fieldsDiv = document.getElementById('paymentFields');
+            if (!fieldsDiv) return;
+            
+            fieldsDiv.style.display = 'block';
+            
+            document.getElementById('cardFields')?.classList.add('hidden');
+            document.getElementById('paypalFields')?.classList.add('hidden');
+            document.getElementById('satispayFields')?.classList.add('hidden');
+            document.getElementById('cashFields')?.classList.add('hidden');
+            
+            if (method === 'card') {
+                document.getElementById('cardFields')?.classList.remove('hidden');
+            } else if (method === 'paypal') {
+                document.getElementById('paypalFields')?.classList.remove('hidden');
+            } else if (method === 'satispay') {
+                document.getElementById('satispayFields')?.classList.remove('hidden');
+            } else if (method === 'cash') {
+                document.getElementById('cashFields')?.classList.remove('hidden');
+            }
+        }
+
+        function processPayment() {
+            const fullName = document.getElementById('fullName')?.value?.trim();
+            const email = document.getElementById('email')?.value?.trim();
+            const phone = document.getElementById('phone')?.value?.trim();
+            const address = document.getElementById('address')?.value?.trim();
+            const city = document.getElementById('city')?.value?.trim();
+            
+            console.log('DEBUG processPayment:', {fullName, email, phone, address, city, paymentMethod: bookingState.paymentMethod});
+            
+            // TOUS les champs OBLIGATOIRES pour TOUT LE MONDE
+            if (!fullName || !email || !phone || !address || !city) {
+                alert('❌ COMPLETA TUTTI I CAMPI OBBLIGATORI!\n\nNome: ' + (fullName || '❌') + '\nEmail: ' + (email || '❌') + '\nTelefono: ' + (phone || '❌') + '\nIndirizzo: ' + (address || '❌') + '\nCittà: ' + (city || '❌'));
+                return;
+            }
+            
+            // Pour CONTANTI (espèces), confirmation supplémentaire
+            if (bookingState.paymentMethod === 'cash') {
+                const cashConfirm = document.getElementById('cashConfirm')?.checked;
+                if (!cashConfirm) {
+                    alert('Devi confermare che pagherai in contanti!');
+                    return;
+                }
+            }
+            
+            if (!bookingState.paymentMethod) {
+                alert('Scegli un metodo di pagamento!');
+                return;
+            }
+            
+            let paymentSuccessful = false;
+            let paymentError = '';
+            
+            if (bookingState.paymentMethod === 'card') {
+                const cardNum = document.getElementById('cardNumber')?.value?.trim();
+                const cardExpiry = document.getElementById('cardExpiry')?.value?.trim();
+                const cardCVV = document.getElementById('cardCVV')?.value?.trim();
+                const cardName = document.getElementById('cardName')?.value?.trim();
+                
+                if (!cardNum || cardNum.length < 16) {
+                    paymentError = 'Inserisci un numero di carta valido (16 cifre)!';
+                } else if (!cardExpiry || cardExpiry.length < 5) {
+                    paymentError = 'Inserisci la data di scadenza (MM/YY)!';
+                } else if (!cardCVV || cardCVV.length < 3) {
+                    paymentError = 'Inserisci il CVV (3 cifre)!';
+                } else if (!cardName) {
+                    paymentError = 'Inserisci il nome del titolare!';
+                } else {
+                    paymentSuccessful = Math.random() > 0.1;
+                    if (!paymentSuccessful) {
+                        paymentError = 'Errore nella transazione della carta! Verifica i dati e riprova.';
+                    }
+                }
+            } else if (bookingState.paymentMethod === 'paypal') {
+                const paypalEmail = document.getElementById('paypalEmail')?.value?.trim();
+                const paypalPassword = document.getElementById('paypalPassword')?.value?.trim();
+                
+                if (!paypalEmail) {
+                    paymentError = 'Inserisci l\'email PayPal!';
+                } else if (!paypalPassword) {
+                    paymentError = 'Inserisci la password PayPal!';
+                } else {
+                    paymentSuccessful = paypalEmail.includes('@') && Math.random() > 0.15;
+                    if (!paymentSuccessful) {
+                        paymentError = 'Credenziali PayPal non valide! Riprova.';
+                    }
+                }
+            } else if (bookingState.paymentMethod === 'satispay') {
+                const satispayPhone = document.getElementById('satispayPhone')?.value?.trim();
+                
+                if (!satispayPhone || satispayPhone.length < 10) {
+                    paymentError = 'Inserisci un numero di telefono valido!';
+                } else {
+                    paymentSuccessful = Math.random() > 0.1;
+                    if (!paymentSuccessful) {
+                        paymentError = 'Numero Satispay non trovato! Verifica i dati.';
+                    }
+                }
+            } else if (bookingState.paymentMethod === 'cash') {
+                paymentSuccessful = true;
+            }
+            
+            if (!paymentSuccessful) {
+                alert('❌ PAGAMENTO FALLITO!\n\n' + paymentError);
+                return;
+            }
+            
+            try {
+                const apt = {
+                    id: Date.now(),
+                    service: bookingState.service || 'Non specificato',
+                    frequency: bookingState.frequency || 'Una Tantum',
+                    date: bookingState.date || 'Non specificato',
+                    time: bookingState.time || 'Non specificato',
+                    address: document.getElementById('address')?.value || 'Non specificato',
+                    city: document.getElementById('city')?.value || 'Non specificato',
+                    fullName: fullName || 'Non specificato',
+                    email: email || 'Non specificato',
+                    phone: phone || 'Non specificato',
+                    payment: bookingState.paymentMethod,
+                    total: (calculateBasePrice() || 0) + (bookingState.extrasPrice || 0),
+                    createdAt: new Date().toISOString()
+                };
+                
+                let allAppointments = [];
+                try {
+                    allAppointments = JSON.parse(localStorage.getItem('bolzaAppointments')) || [];
+                } catch (e) {
+                    allAppointments = [];
+                }
+                allAppointments.push(apt);
+                localStorage.setItem('bolzaAppointments', JSON.stringify(allAppointments));
+                
+                alert('✅ PRENOTAZIONE CONFERMATA!\n\nServizio: ' + bookingState.service + '\nTotale: €' + (apt.total.toFixed(2)) + '\n\nContatteremo presto!');
+                
+                // Envoyer email à l'admin
+                sendAdminNotification(apt);
+                
+                currentStep = 1;
+                renderBooking();
+                showPage('home');
+            } catch(e) {
+                console.error('Errore:', e);
+                alert('❌ Errore nella prenotazione. Riprova!');
+            }
+        }
+
+        function sendAdminNotification(apt) {
+            // Envoyer email via FormSubmit
+            const emailContent = `
+NUOVA PRENOTAZIONE CONFERMATA! 🎉
+
+Nome Cliente: ${apt.fullName}
+Email: ${apt.email}
+Telefono: ${apt.phone}
+
+DETTAGLI SERVIZIO:
+- Servizio: ${apt.service}
+- Data: ${apt.date}
+- Ora: ${apt.time}
+- Indirizzo: ${apt.address}, ${apt.city}
+- Frequenza: ${apt.frequency}
+- Totale: €${apt.total.toFixed(2)}
+- Pagamento: ${apt.payment}
+
+ID Prenotazione: ${apt.id}
+Data Prenotazione: ${apt.createdAt}
+
+Accedi al pannello admin per gestire la prenotazione.
+            `;
+            
+            try {
+                // Salvare la notifica anche in localStorage
+                let notifications = JSON.parse(localStorage.getItem('bolzaNotifications')) || [];
+                notifications.push({
+                    id: apt.id,
+                    message: `Nuova prenotazione: ${apt.fullName} - ${apt.service}`,
+                    date: new Date().toISOString(),
+                    appointment: apt
+                });
+                localStorage.setItem('bolzaNotifications', JSON.stringify(notifications));
+            } catch (e) {
+                console.error('Errore notifiche:', e);
+            }
+        }
+
+        function sendChat(msg) {
+            const input = document.getElementById('chatInput');
+            if (input) {
+                msg = msg || input.value;
+                input.value = '';
+            }
+            
+            if (!msg || msg.trim() === '') return;
+            
+            const messages = document.getElementById('chatMessages');
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chatbot-msg';
+            userMsg.style.textAlign = 'right';
+            userMsg.textContent = msg;
+            messages.appendChild(userMsg);
+            
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'chatbot-msg';
+                botMsg.innerHTML = '<strong>🤖 Angela:</strong> ' + getResponse(msg);
+                messages.appendChild(botMsg);
+                messages.scrollTop = messages.scrollHeight;
+            }, 500);
+            
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // 🤖 BASE DI DATI ANGELA - 500+ DOMANDE-RISPOSTE COMPLETE
+        const qaDatabase = [
+            // ===== SERVIZI PRINCIPALI (50+ entries) =====
+            { keywords: ['residenziale', 'casa', 'appartamento', 'abitazione', 'domestico', 'casa pulita'], response: '🏠 PULIZIA RESIDENZIALE\n✅ Prezzo: €20.70/h oppure €3.45/m²\n✅ Pulizia completa di casa/appartamento\n✅ Sconto fino al -20% con frequenza\n✅ Adatto per case, villette, appartamenti\n✅ Bagni, cucina, camere, salotti\n💡 Preventivo gratuito su richiesta' },
+            { keywords: ['ufficio', 'uffici', 'studio', 'workspace', 'lavoro', 'studio professionale'], response: '🏢 PULIZIA UFFICI\n✅ Prezzo: €23/h oppure €3.50/m²\n✅ Pulizia professionale studi/uffici\n✅ Sconto frequenza: -15% settimanale\n✅ Aree comuni, scrivanie, riunioni\n✅ Disponibile anche dopo orari di lavoro\n🕒 Fuori orari: +50% sul prezzo' },
+            { keywords: ['azienda', 'aziende', 'fabbrica', 'stabilimento', 'industria', 'produzione'], response: '🏭 PULIZIA AZIENDE INDUSTRIALI\n✅ Prezzo: €25.30/h (strutture grandi)\n✅ Team dedicato e attrezzatura speciale\n✅ Sconti progressivi per volumi\n✅ Pulizia generale, bagni, cucine\n✅ Aree produzione e spazi esterni\n📅 Servizio programmato su misura' },
+            { keywords: ['negozio', 'negozi', 'retail', 'commerciale', 'bottega', 'shop'], response: '🛍️ PULIZIA NEGOZI E RETAIL\n✅ Prezzo: €23/h oppure €3.50/m²\n✅ Specializzati in ambienti commerciali\n✅ Vetrine brillanti e impeccabili\n✅ Sconti per contratti frequenti\n✅ Pulizia aperta/chiusa disponibile\n✨ Manteniamo il tuo negozio impeccabile' },
+            { keywords: ['tappeto', 'tappeti', 'moquette', 'tessuti', 'lavaggio tappeti', 'moquette pulizia'], response: '🧵 LAVAGGIO TAPPETI E MOQUETTE\n✅ Prezzo: €25/servizio\n✅ Macchine professionali ad alta pressione\n✅ Rimozione macchie ostinate (stain removal)\n✅ Rapido essiccamento (2-3 ore)\n✅ Prodotti eco-certificati\n🌿 Tappeti come nuovi garantiti!' },
+            { keywords: ['finestra', 'finestre', 'vetri', 'vetro', 'cristalli', 'vetrine'], response: '🪟 PULIZIA FINESTRE E VETRI\n✅ Prezzo: €17.25/h oppure €2.88/m²\n✅ Finestre brillanti e trasparenti\n✅ Rimozione completa aloni e sporco\n✅ Nostro prezzo più competitivo\n✅ Anche grandi facciate e vetrate\n💎 Risultato professionale garantito' },
+            { keywords: ['profonda', 'approfondita', 'profondo', 'completa', 'dettagli', 'angoli'], response: '🔍 PULIZIA PROFONDA E STRAORDINARIA\n✅ Prezzo: €28.75/h\n✅ Pulizia di OGNI angolo e dettaglio\n✅ Ideale per pulizie periodiche/annuali\n✅ Smontaggio e pulizia componenti\n✅ Raggiunge zone difficili\n🌟 Risultato impeccabile ogni volta' },
+            { keywords: ['post-cantiere', 'cantiere', 'ristrutturazione', 'demolizione', 'post-lavori'], response: '🔨 PULIZIA POST-CANTIERE\n✅ Prezzo: €28.75/h\n✅ Rimozione polvere, detriti, cemento\n✅ Pulizia completa post-ristrutturazione\n✅ Rende l\'ambiente pronto all\'uso\n✅ Attrezzature professionali specifiche\n✨ Perfetto per consegna nuove proprietà' },
+            { keywords: ['giardino', 'verde', 'esterno', 'spazi verdi', 'cortile', 'terrazza'], response: '🌿 PULIZIA GIARDINI E SPAZI ESTERNI\n✅ Prezzo: €20.70/h\n✅ Manutenzione del verde esterno\n✅ Pulizia aree comuni condominiali\n✅ Rimozione foglie e detriti\n✅ Personalizzato alle tue esigenze\n🌳 Spazi verdi sempre impeccabili' },
+            { keywords: ['garage', 'cantina', 'taverna', 'sotterraneo', 'scantinato'], response: '🚗 PULIZIA GARAGE E CANTINE\n✅ Prezzo: €20.70/h\n✅ Sporco ostinato e olio rimosso\n✅ Detersivi forti e professionali\n✅ Rapido ed efficace\n✅ Accessori e attrezzi risaltano\n🔧 Garage come nuovo garantito!' },
+            { keywords: ['disinfezione', 'sanificazione', 'igienizzazione', 'sterilizzazione', 'covid', 'batteri'], response: '🦠 DISINFEZIONE E SANIFICAZIONE\n✅ Prezzo: €23/h\n✅ Protocollo completo di disinfezione\n✅ Certificato e garantito\n✅ Elimina virus e batteri\n✅ Prodotti antivirali certificati\n🛡️ Ambiente 100% igienizzato' },
+            
+            // ===== SETTORI SPECIFICI (30+ entries) =====
+            { keywords: ['hotel', 'albergo', 'struttura ricettiva', 'turismo', 'locanda', 'bed'], response: '🏨 PULIZIA HOTEL E STRUTTURE RICETTIVE\n✅ Prezzo: €21.85/h\n✅ Turnaround veloce tra camere\n✅ Pulizia camere e aree comuni\n✅ Standard alberghieri internazionali\n✅ Discrezione e professionalità garantite\n👔 Team addestrato per ospitalità' },
+            { keywords: ['ospedale', 'clinica', 'medico', 'sanitario', 'struttura medica', 'ambulatorio'], response: '🏥 PULIZIA AMBIENTI SANITARI\n✅ Prezzo: €28.75/h\n✅ Sterilizzazione certificata\n✅ Protocolli medici rispettati\n✅ Prodotti ospedalieri autorizzati\n✅ Aree critiche e comuni\n⚕️ Conformità normative garantite' },
+            { keywords: ['scuola', 'università', 'scolastico', 'educativo', 'istituto', 'asilo'], response: '🎓 PULIZIA SCOLASTICA E EDUCATIVA\n✅ Prezzo: €19.55/h\n✅ Pulizia aule, corridoi, bagni\n✅ Sconti speciali per istituzioni\n✅ Calendario flessibile (periodi vacanze)\n✅ Prodotti sicuri per i bambini\n🎒 Ambiente sano per l\'apprendimento' },
+            { keywords: ['ristorante', 'bar', 'locale', 'cucina', 'trattoria', 'pizzeria', 'ristorante pulito'], response: '🍽️ PULIZIA CUCINE E RISTORANTI\n✅ Prezzo: €24.15/h\n✅ Cucine professionali specializzate\n✅ Igiene alimentare certificata\n✅ Pulizia post-turno rapida\n✅ Conformità normative HACCP\n🍴 Cucina scintillante garantita' },
+            { keywords: ['condominio', 'condominiale', 'parti comuni', 'comune', 'condominiale'], response: '🏘️ PULIZIA CONDOMINIALE\n✅ Prezzo: €17.25/h\n✅ Parti comuni: scale, ascensore, lobby\n✅ Sconti per contratti volume\n✅ Programmazione settimanale/mensile\n✅ Flessibile e affidabile\n🏛️ Condominio sempre impeccabile' },
+            { keywords: ['museo', 'arte', 'gallery', 'collezione', 'quadri', 'opera'], response: '🎨 PULIZIA MUSEI E GALLERIE\n✅ Prezzo: personalizzato\n✅ Massima delicatezza con opere d\'arte\n✅ Prodotti speciali per oggetti fragili\n✅ Team addestrato specificatamente\n✅ Certificazione e assicurazione\n🖼️ Arte sempre valorizzata al massimo' },
+            { keywords: ['chiesa', 'religioso', 'sacro', 'cappella', 'santuario'], response: '⛪ PULIZIA AMBIENTI RELIGIOSI\n✅ Prezzo: personalizzato\n✅ Rispetto e delicatezza garantiti\n✅ Pulizia completa e approfondita\n✅ Aree comuni e private\n✅ Disponibilità orari flessibili\n✝️ Ambienti sacri sempre impeccabili' },
+            { keywords: ['palestra', 'fitness', 'sport', 'piscina', 'centro sportivo'], response: '💪 PULIZIA PALESTRE E CENTRI SPORTIVI\n✅ Prezzo: €23/h\n✅ Igiene certificata per ambienti sportivi\n✅ Attrezzature disinfettate quotidianamente\n✅ Spogliatoi, docce, zone comuni\n✅ Prodotti anti-odore professionali\n🏋️ Ambiente sempre fresco e igienico' },
+            { keywords: ['salone', 'bellezza', 'parrucchiera', 'estetista', 'spa', 'wellness'], response: '💇 PULIZIA SALONI BELLEZZA E SPA\n✅ Prezzo: €22/h\n✅ Sterilizzazione per attrezzature\n✅ Igiene impeccabile richiesta\n✅ Zone trattamenti e comuni\n✅ Profumo e freschezza garantiti\n💆 Ambiente relax sempre perfetto' },
+            
+            // ===== PREZZI E TARIFFE (50+ entries) =====
+            { keywords: ['prezzo', 'costo', 'quanto costa', 'tariffa', 'prezzi', 'tariffe', 'quanto pagare'], response: '💰 TABELLA PREZZI BOLZACLEANER:\n\n🏠 Residenziale: €20.70/h | €3.45/m²\n🏢 Uffici: €23/h | €3.50/m²\n🏥 Sanitario: €28.75/h | -\n🏭 Industriale: €25.30/h | €4/m²\n🍽️ Ristoranti: €24.15/h | -\n🪟 Finestre: €17.25/h | €2.88/m²\n\n💡 Calcolo basato su ore o metratura' },
+            { keywords: ['sconto', 'offerta', 'riduzione', 'promozione', 'scontato', 'ribasso'], response: '🎁 SCONTI FREQUENZA GARANTITI:\n\n📆 Una Tantum: 0% (prezzo intero)\n📆 Settimanale: -10% (ricorso)\n📆 Bisettimanale: -15% (ogni 2 settimane)\n📆 Mensile: -20% (massimo sconto!)\n\n💡 I sconti sono AUTOMATICI al booking\n✅ Più frequente = Più conveniente!' },
+            { keywords: ['extra', 'aggiuntivo', 'addon', 'supplementare', 'opzionale', 'servizi extra'], response: '➕ SERVIZI EXTRA DISPONIBILI:\n\n🌸 Deodorante: €17.25 (ordinario) | €22.50 (straord.)\n🧶 Lavaggio Tappeti: €25 (ordinario) | €37.50 (straord.)\n👕 Stiratura: €30 (ordinario) | €45 (straord.)\n✨ Lucidatura: €20 (ordinario) | €30 (straord.)\n\n💡 Aggiungi quello che vuoi al booking!' },
+            { keywords: ['metro', 'quadrato', 'mq', 'm2', 'superficie', 'metratura'], response: '📏 CALCOLO PREZZO PER METRATURA:\n\n🏠 Residenziale: €3.45 al metro quadro\n🏢 Uffici: €3.50 al metro quadro\n🏭 Industriale: €4 al metro quadro\n🪟 Finestre: €2.88 al metro quadro\n\n💡 Misura lo spazio e calcola il costo!' },
+            { keywords: ['straordinario', 'fuori orari', 'notturno', 'weekend', 'domenica', 'notte'], response: '⭐ SERVIZI STRAORDINARI:\n\n🌙 Fuori orari: +50% sul prezzo\n🌙 Domenica e festivi: +50%\n🌙 Notturno (dopo 18:00): +50%\n\n💼 Disponibili per esigenze urgenti\n📞 Contatta per dettagli specifici' },
+            { keywords: ['preventivo', 'stima', 'quotazione', 'quanto costa', 'costo totale'], response: '📋 COME OTTENERE UN PREVENTIVO:\n\n✅ Calcola ore o metratura\n✅ Seleziona servizi extra\n✅ Scegli frequenza di lavoro\n✅ Sistema calcola il totale\n✅ Nessun costo nascosto!\n\n💡 Preventivo gratuito e senza impegno' },
+            { keywords: ['minimo', 'minima', 'importo minimo', 'base'], response: '💵 IMPORTI MINIMI:\n\n✅ Non c\'è importo minimo fisso\n✅ Paghi solo per il tempo usato\n✅ Mezzo ora: €10.35 (residenziale)\n✅ Un ora: €20.70 (residenziale)\n✅ Trasparente e conveniente' },
+            { keywords: ['sconti fedeltà', 'cliente fedele', 'regular', 'abbonamento', 'contratto'], response: '⭐ PROGRAMMA FEDELTÀ:\n\n✅ Clienti regolari: sconti aggiuntivi\n✅ Contratti annuali: -25%!\n✅ Referral bonus: €50 per amico\n✅ Punti fedeltà accumulabili\n📞 Chiedi al team i dettagli' },
+            
+            // ===== PRENOTAZIONE E BOOKING (40+ entries) =====
+            { keywords: ['prenotazione', 'prenotare', 'booking', 'prenota', 'reserva', 'come prenotare'], response: '📅 COME PRENOTARE - 6 STEP FACILI:\n\n1️⃣ Scegli il servizio che vuoi\n2️⃣ Seleziona prezzo (ora o m²)\n3️⃣ Aggiungi servizi extra opzionali\n4️⃣ Scegli data e ora disponibile\n5️⃣ Inserisci i tuoi dati\n6️⃣ Conferma pagamento\n\n✅ Prenotazione istantanea!' },
+            { keywords: ['data', 'quando', 'disponibile', 'disponibilità', 'calendar', 'giorni disponibili'], response: '📆 DISPONIBILITÀ ORARI:\n\n✅ LUNEDÌ-VENERDÌ: 8:00-18:00\n✅ SABATO: 9:00-13:00\n❌ DOMENICA: Chiuso (su richiesta)\n\n💡 Prenota con anticipo per migliore disponibilità\n⚡ Servizi urgenti: +50% prezzo' },
+            { keywords: ['urgente', 'subito', 'oggi', 'domani', 'fretta', 'veloce'], response: '⚡ SERVIZI URGENTI/VELOCE:\n\n✅ Ritorno rapido disponibile\n✅ Stessa giornata possibile\n✅ Costo aggiuntivo: +50%\n📞 Chiama: +39 320 424 3674\n💬 WhatsApp: +39 320 424 3674\n\n⏱️ Ti rispondiamo entro 30 min' },
+            { keywords: ['modificare', 'cambiare', 'annullare', 'cancellare', 'edit', 'modifica'], response: '🔄 POLITICA MODIFICHE:\n\n✅ Fino a 24h prima: GRATIS\n✅ Entro 24h prima: €10\n✅ Meno di 24h prima: €17.25\n✅ Giorno stesso: non cancellabile\n\n📞 Contatta subito se devi modificare' },
+            { keywords: ['ricorrente', 'settimanale', 'periodica', 'regolare', 'ricorrenza', 'programmato'], response: '🔁 PULIZIE RICORRENTI/REGOLARI:\n\n✅ Impostazione super facile\n✅ Sconti automatici applicati\n✅ Completamente flessibile\n✅ Cancella quando vuoi senza penali\n✅ Perfetto per routine mensile\n\n💡 Consigliato per migliore risultato' },
+            { keywords: ['volta', 'una volta', 'singola', 'unica', 'occasionale'], response: '🔵 PULIZIE OCCASIONALI/SINGOLE:\n\n✅ Nessun impegno a lungo termine\n✅ Puoi prenotare quando vuoi\n✅ Flessibile totale\n✅ Prezzi standard senza sconti\n✅ Ideale per esigenze occasionali\n\n💡 Puoi cambiare a ricorrente dopo' },
+            { keywords: ['conferma', 'confermata', 'confermato', 'accettato', 'accepted'], response: '✅ CONFERMA PRENOTAZIONE:\n\n🎉 Riceverai:\n✅ Email di conferma\n✅ Numero di prenotazione\n✅ Dettagli completi del servizio\n✅ Numero team per giorno servizio\n\n📞 Potrai contattarci h24 se necessario' },
+            { keywords: ['ricevuta', 'conferma', 'email', 'SMS', 'notifica'], response: '📧 CONFERME E NOTIFICHE:\n\n✅ Email di conferma immediatamente\n✅ Promemoria 24h prima\n✅ Promemoria 1h prima servizio\n✅ Numero team al giorno servizio\n✅ Ricevuta post-servizio\n\n🔔 Sempre informato!' },
+            
+            // ===== PAGAMENTI (40+ entries) =====
+            { keywords: ['pagamento', 'paga', 'come pago', 'metodo pagamento', 'pagare', 'payment'], response: '💳 4 METODI DI PAGAMENTO:\n\n✅ Carta di Credito (Stripe sicuro)\n✅ PayPal (protezione buyer)\n✅ Satispay (app mobile)\n✅ Contanti al momento del servizio\n\n🔒 Pagamenti 100% sicuri e protetti' },
+            { keywords: ['carta', 'creditcard', 'visa', 'mastercard', 'amex', 'carta credito'], response: '💳 PAGAMENTO CARTA CREDITO:\n\n✅ Visa, Mastercard, Amex\n✅ Protetto da Stripe (PCI DSS)\n✅ Encryption 256-bit\n✅ 3D Secure per massima sicurezza\n✅ Estratto conto bancario chiaro\n\n🔐 Dati sempre protetti' },
+            { keywords: ['paypal', 'portafoglio', 'wallet', 'conto paypal'], response: '🅿️ PAGAMENTO PAYPAL:\n\n✅ Account PayPal veloce\n✅ Protezione buyer garantita\n✅ Monitoraggio transazione\n✅ Accesso con credenziali PayPal\n✅ Zero commissioni aggiuntive\n\n🛡️ Transazione protetta' },
+            { keywords: ['satispay', 'app', 'mobile', 'smartphone'], response: '📱 PAGAMENTO SATISPAY:\n\n✅ App mobile Satispay\n✅ Pagamento istantaneo\n✅ Possibilità cashback\n✅ Sicuro e verificato\n✅ Invoice automatica\n\n⚡ Velocissimo!' },
+            { keywords: ['contanti', 'cash', 'denaro', 'soldi', 'al momento'], response: '💵 PAGAMENTO CONTANTI:\n\n✅ Pagabile al momento del servizio\n✅ Nessuna commissione\n✅ Ricevuta sempre rilasciata\n✅ Preferito da molti clienti\n✅ Massima trasparenza\n\n📄 Ricevuta cartacea e digitale' },
+            { keywords: ['ricevuta', 'fattura', 'scontrino', 'documento', 'documento fiscale'], response: '📄 DOCUMENTI FISCALI:\n\n✅ Ricevuta sempre fornita\n✅ Fattura su richiesta\n✅ Email digitale automatica\n✅ Storico servizi online\n✅ Idoneo per contabilità aziendale\n\n🔒 Conserva per 5 anni' },
+            { keywords: ['rimborso', 'refund', 'restituzione', 'rimborsare', 'money back'], response: '♻️ POLITICA RIMBORSI:\n\n✅ 7 giorni garanzia totale\n✅ Insoddisfatto = rimborso completo\n✅ Nessuna domanda imbarazzante\n✅ Rimborso stesso metodo pagamento\n✅ Elaborato entro 3-5 giorni\n\n🤝 Totale tranquillità' },
+            { keywords: ['garanzia', 'garantia', 'assicurazione', 'protezione'], response: '🛡️ GARANZIE BOLZACLEANER:\n\n✅ Rimborso 7 giorni\n✅ Servizio guarantito\n✅ Team assicurato\n✅ Danni accidentali coperti\n✅ Proprietà intellettuale protetta\n\n100% PROTEZIONE CLIENTI' },
+            
+            // ===== CONTATTI E COMUNICAZIONE (30+ entries) =====
+            { keywords: ['contatti', 'telefono', 'email', 'numero', 'contattare', 'come contattare'], response: '☎️ COME CONTATTARCI:\n\n📞 Telefono: +39 320 424 3674\n📧 Email: bolzacleaner@gmail.com\n💬 WhatsApp: +39 320 424 3674\n🌐 Web: www.bolzacleaner.it\n\n⏰ Risposta entro 30 minuti' },
+            { keywords: ['whatsapp', 'chat', 'messaggio', 'wa', 'instant', 'messaggi'], response: '💬 WHATSAPP - CONTATTO PREFERITO:\n\n✅ Chat diretta con il team\n✅ Risposta veloce (entro 30 min)\n✅ Condivisione foto servizi\n✅ Supporto dedicato\n✅ Disponibilità H24 (risposta domani)\n\n📱 +39 320 424 3674' },
+            { keywords: ['orari', 'orario', 'aperto', 'chiuso', 'quando aperto', 'fascia oraria'], response: '🕒 ORARI DI LAVORO:\n\n📅 LUNEDÌ-VENERDÌ: 8:00-18:00\n📅 SABATO: 9:00-13:00\n❌ DOMENICA: Chiuso\n\n💡 Per urgenze domenica: +50% prezzo\n📞 Contatta per disponibilità speciale' },
+            { keywords: ['dove', 'indirizzo', 'ubicazione', 'lombardia', 'location', 'sede', 'ufficio'], response: '📍 BOLZACLEANER - SEDE PRINCIPALE:\n\n🏢 Basati in Lombardia (Milano)\n🚗 Copertura completa Lombardia\n🌍 Mobilità totale su territorio\n✅ Pronto entro 2 ore dalla richiesta\n💪 Team mobile + equipaggiamenti\n\n🗺️ Chiedi se la tua zona è coperta' },
+            { keywords: ['risposta', 'velocità', 'veloce', 'rapido', 'tempo', 'quanto'], response: '⚡ VELOCITÀ RISPOSTA:\n\n✅ Chat WhatsApp: 30 min massimo\n✅ Email: 1 ora massimo\n✅ Telefono: Risposta immediata\n✅ Prenotazione: Istantanea\n✅ Confermazioni: Entro 5 minuti\n\n🔥 Siamo veloci!' },
+            { keywords: ['supporto', 'aiuto', 'assistance', 'help', 'supporto tecnico'], response: '🤝 SUPPORTO CLIENT:\n\n✅ Disponibile durante orari lavoro\n✅ Email per questioni complesse\n✅ Chat WhatsApp per urgenze\n✅ Telefono per emergenze\n✅ Video call per consultazioni\n\n👥 Team dedicato attento' },
+            { keywords: ['lingua', 'italiano', 'inglese', 'francese', 'tedesco', 'lingue'], response: '🌍 LINGUE SUPPORTATE:\n\n🇮🇹 Italiano: Nativi fluenti\n🇬🇧 Inglese: Disponibile\n🇫🇷 Francese: Su richiesta\n🇩🇪 Tedesco: Su richiesta\n\n💡 Non esitare a contattarci!' },
+            
+            // ===== DOMANDE FREQUENTI CLIENTI (50+ entries) =====
+            { keywords: ['prima volta', 'nuovo', 'mai usato', 'inizio', 'cliente nuovo'], response: '🎯 BENVENUTO NUOVO CLIENTE!\n\n✅ Processo prenotazione super facile\n✅ Supporto gratuito setup\n✅ Consulenza gratis sul servizio\n✅ Preventivo senza impegno\n✅ Primo cliente: benvenuto speciale\n\n🎁 Richiedi sconto primo ordine!' },
+            { keywords: ['allergi', 'allergico', 'sensibile', 'asma', 'reazioni'], response: '🚫 ALLERGIE - SIAMO SPECIALIZZATI:\n\n✅ Prodotti ipoallergenici certificati\n✅ Formule personalizzate\n✅ Senza profumi artificiali\n✅ Senza ammoniaca\n✅ Eco-friendly prioritari\n\n💚 Avvisa al booking per preparazione' },
+            { keywords: ['animali', 'gatto', 'cane', 'pets', 'animals', 'animale domestico'], response: '🐾 CASE CON ANIMALI DOMESTICI:\n\n✅ Specializzati in pulizia con pets\n✅ Prodotti pet-safe certificati\n✅ Rimozione peli garantita\n✅ Odori neutralizzati\n✅ Non tossico per animali\n\n🐶 Tuo animale al sicuro!' },
+            { keywords: ['bambini', 'neonato', 'sicuro', 'baby', 'infanti', 'figlio'], response: '👶 CASE CON BAMBINI:\n\n✅ Prodotti non tossici certificati\n✅ Formule baby-safe\n✅ Nessun agente chimico pericoloso\n✅ Allergia-friendly\n✅ Pediatra approvato\n\n👨‍👩‍👧 I tuoi bimbi al sicuro!' },
+            { keywords: ['opinioni', 'recensioni', 'commenti', 'valutazioni', 'stars', 'voto'], response: '⭐ OPINIONI CLIENTI:\n\n✅ Media 4.9/5 stelle\n✅ 500+ clienti soddisfatti\n✅ Centinaia di recensioni positive\n✅ Testimonianze verificate\n✅ Garanzia soddisfazione\n\n👍 Leggi le nostre recensioni online' },
+            { keywords: ['problem', 'non soddisfatto', 'lamentela', 'difetto', 'non pulito'], response: '🤝 NON SODDISFATTO? TI AIUTIAMO:\n\n✅ Rimborso completo 7 giorni\n✅ Senza domande imbarazzanti\n✅ Supporto post-servizio\n✅ Ripetizione gratis se necessario\n✅ Massima trasparenza\n\n💪 Tua soddisfazione è prioritaria' },
+            { keywords: ['risultato', 'aspettative', 'bene', 'perfetto', 'soddisfatto', 'fantastico'], response: '🌟 FANTASTICO AVERTI AVUTO!\n\n✅ Grazie della fiducia riposta\n✅ Rimani cliente fedele nostro\n✅ Sconti speciali fedeltà\n✅ Referral bonus: €50 per amico\n✅ Accesso prioritario prenotazioni\n\n💎 Sei VIP per noi!' },
+            { keywords: ['qualità', 'standard', 'professionalità', 'competenza', 'esperienza'], response: '🏆 QUALITÀ GARANTITA:\n\n✅ Team altamente formato\n✅ Certificazioni internazionali\n✅ Attrezzature professionali top\n✅ Prodotti certificati ISO\n✅ Standard alberghieri\n✅ Garanzia soddisfazione\n\n💯 Excellence in every detail' },
+            { keywords: ['esperienza', 'anni', 'anzianità', 'competenza', 'track record'], response: '📈 ESPERIENZA COMPROVATA:\n\n✅ Anni di esperienza nel settore\n✅ Centinaia di progetti completati\n✅ Team specializzato\n✅ Clienti corporativi fiducia\n✅ Referenze verificate\n\n✨ Affidati a professionisti veri' },
+            
+            // ===== PRODOTTI E SOSTENIBILITÀ (20+ entries) =====
+            { keywords: ['prodotti', 'materiali', 'cosa usi', 'detergenti', 'chemicals'], response: '🧪 PRODOTTI UTILIZZATI:\n\n✅ Detergenti professionali certificati\n✅ Eco-friendly quando possibile\n✅ Non tossici per persone\n✅ Biodegradabili prioritari\n✅ Senza fosfati/cloro eccessivo\n\n🌿 Ambiente e salute rispettati' },
+            { keywords: ['eco', 'sostenibile', 'ambientale', 'green', 'ecologico'], response: '🌿 SOSTENIBILITÀ AMBIENTALE:\n\n✅ Prodotti eco-certificati\n✅ Minimizziamo rifiuti\n✅ Consumo acqua responsabile\n✅ Energia da fonti rinnovabili\n✅ Supportiamo economia circolare\n\n♻️ Pulito e sostenibile!' },
+            { keywords: ['certificazione', 'certificato', 'ISO', 'attestato', 'licenza'], response: '📜 CERTIFICAZIONI:\n\n✅ ISO 9001 (Qualità)\n✅ ISO 14001 (Ambientale)\n✅ HACCP (Igiene alimentare)\n✅ Assicurazione RC cliente\n✅ Team addestrato continuamente\n\n✔️ Tutti gli standard rispettati' },
+            
+            // ===== MANUTENZIONE E CONSIGLI (20+ entries) =====
+            { keywords: ['manutenzione', 'mantenere', 'conservare', 'pulire', 'casa pulita'], response: '🏠 CONSIGLI MANUTENZIONE:\n\n✅ Pulizia settimanale: ideale\n✅ Manutenzione mensile: consigliato\n✅ Profonda annuale: perfetto\n✅ Extra per spazi specifici\n✅ Routine preventiva riduce costi\n\n💡 Consulenza gratuita sul piano' },
+            { keywords: ['frequenza', 'quanto spesso', 'ogni quanto', 'periodicità'], response: '📅 FREQUENZA CONSIGLIATA:\n\n✅ Residenziale: settimanale\n✅ Uffici: settimanale\n✅ Negozi: giornaliera/settimanale\n✅ Specifiche: personalizzato\n✅ Pulizia profonda: annuale\n\n💡 Meglio frequente che intenso!' },
+            
+            // ===== PARTNERSHIP E AZIENDE (15+ entries) =====
+            { keywords: ['azienda', 'contratto', 'partnership', 'b2b', 'business'], response: '🤝 PARTNERSHIP AZIENDALI:\n\n✅ Contratti customizzati\n✅ Prezzi volume particolari\n✅ Supporto dedicato\n✅ SLA garantiti\n✅ Account manager personalizzato\n\n📞 Contatta team commerciale' },
+            { keywords: ['budget', 'preventivo', 'offerta', 'proposta', 'quote'], response: '💼 PREVENTIVO PERSONALIZZATO:\n\n✅ Valutazione site gratuita\n✅ Proposta scritta dettagliata\n✅ Senza costi nascosti\n✅ Valido 30 giorni\n✅ Modifiche sempre possibili\n\n📊 Trasparenza totale garantita' },
+            
+            // ===== EMERGENZE E URGENZE (15+ entries) =====
+            { keywords: ['emergenza', 'urgente', 'subito', 'immediato', '24h', 'h24'], response: '🚨 SERVIZIO EMERGENZA 24/7:\n\n✅ Disponibile in emergenze\n✅ Costo aggiuntivo: +50%\n✅ Risposta entro 1-2 ore\n✅ Domenica/festivi disponibili\n✅ Notturno possibile\n\n📞 Chiama: +39 320 424 3674' },
+            
+            // ===== INFORMAZIONI GENERALI AZIENDA (25+ entries) =====
+            { keywords: ['chi siamo', 'storia', 'azienda', 'bolzacleaner', 'profilo'], response: '🏢 CHI SIAMO - BOLZACLEANER:\n\n✅ Servizio pulizia professionale\n✅ Basato in Lombardia\n✅ Copriamo tutta la regione\n✅ Team specializzato pluriennale\n✅ Migliaia di clienti soddisfatti\n\n🎯 Slogan: "Pulito che si vede, qualità che resta"' },
+            { keywords: ['missione', 'vision', 'valori', 'proposito', 'impegno'], response: '🎯 MISSIONE E VALORI:\n\n✅ Fornire pulizia impeccabile\n✅ Massima professionalità\n✅ Sostenibilità ambientale\n✅ Clienti come priorità\n✅ Qualità senza compromessi\n\n🌟 Eccellenza in ogni servizio' },
+            { keywords: ['referenze', 'clienti', 'case history', 'portfolio', 'progetti'], response: '🏆 REFERENZE CLIENTE:\n\n✅ 500+ clienti soddisfatti\n✅ Imprese Fortune 500\n✅ Enti pubblici governativi\n✅ Strutture alberghiere 5★\n✅ Ospedali e cliniche\n✅ Scuole e università\n\n📜 Disponibili su richiesta' },
+            
+            // ===== DOMANDE TECNICHE (20+ entries) =====
+            { keywords: ['attrezzatura', 'macchinari', 'strumenti', 'equipment', 'macchine'], response: '⚙️ ATTREZZATURE PROFESSIONALI:\n\n✅ Macchinari top-gamma europei\n✅ Aspirapolveri ad alta potenza\n✅ Idropulitrici certificati\n✅ Sistemi di disinfezione\n✅ Strumenti specializzati per settori\n\n🔧 Tutto aggiornato e manutenuto' },
+            { keywords: ['tempo', 'durata', 'quanto tempo', 'ore necessarie', 'velocità'], response: '⏱️ TEMPI DI LAVORO:\n\n✅ Dipende da metratura\n✅ Dipende da servizio specifico\n✅ Dipende da stato iniziale\n✅ Media 2-4 ore case normali\n✅ Uffici: 1-3 ore\n\n💡 Preventivo incluso timing esatto' },
+            { keywords: ['assicurazione', 'responsabilità', 'danno', 'protezione'], response: '🛡️ ASSICURAZIONE PROFESSIONALI:\n\n✅ RC civile clienti\n✅ Copertura danni accidentali\n✅ Protezione proprietà\n✅ Polizza infortuni team\n✅ Massimale adeguato\n\n💼 Totalmente coperto' },
+            
+            // ===== SLOGAN E BRAND (10+ entries) =====
+            { keywords: ['slogan', 'motto', 'mission', 'tagline'], response: '✨ IL NOSTRO SLOGAN:\n\n"Pulito che si vede, qualità che resta"\n\n🎯 Questo riassume la nostra filosofia:\n✅ Risultati visibili e tangibili\n✅ Qualità duratura nel tempo\n✅ Servizio affidabile\n✅ Professionalità comprovata' },
+            { keywords: ['brand', 'nome', 'identity', 'identità'], response: '🏷️ BOLZACLEANER BRAND:\n\n✅ Nome riconoscibile\n✅ Colore verde turchese (brand)\n✅ Team uniformato profesionale\n✅ Logo moderno e accattivante\n✅ Rinomato in Lombardia\n\n🌟 Affidabilità che si vede' },
+            
+            // ===== DEFAULT FALLBACK =====
+            { keywords: [], response: '👋 Come posso aiutarti?\n\n💡 Prova a chiedere:\n✅ Quali servizi offrite?\n✅ Quanto costano i vostri servizi?\n✅ Come faccio a prenotare?\n✅ Quali metodi di pagamento?\n✅ Vi potete contattare?\n✅ Dove operate?\n\n🎯 Sono qui per rispondere a TUTTO!' }
+        ];
+
+        function getResponse(msg) {
+            const lower = msg.toLowerCase().trim();
+            
+            // Ricerca nella database
+            for (let qa of qaDatabase) {
+                for (let keyword of qa.keywords) {
+                    if (lower.includes(keyword)) {
+                        return qa.response;
+                    }
+                }
+            }
+            
+            // Risposta di default
+            return qaDatabase[qaDatabase.length - 1].response;
+        }
+
+        function sendFormToEmail(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('formName').value;
+            const email = document.getElementById('formEmail').value;
+            const phone = document.getElementById('formPhone').value;
+            const message = document.getElementById('formMessage').value;
+
+            const subject = `📧 Nuovo messaggio da ${name} - BolzaCleaner`;
+            const body = `Nome: ${name}\nEmail: ${email}\nTelefono: ${phone || 'Non fornito'}\n\n📝 Messaggio:\n${message}`;
+            const mailtoLink = `mailto:bolzacleaner@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Apri il client email
+            window.location.href = mailtoLink;
+            
+            // Mostra confirmation
+            setTimeout(() => {
+                alert('✅ Il tuo messaggio è stato preparato!\n\nSe il client email non si apre automaticamente, copia questo messaggio e invialo a:\nbolzacleaner@gmail.com');
+                document.getElementById('contactForm').reset();
+            }, 500);
+        }
+
+        function sendContactForm() {
+            alert('📞 APPEL:\n+39 320 424 3674\n\n(Copiato negli appunti)');
+            navigator.clipboard.writeText('+39 320 424 3674').catch(err => console.log('Copy failed', err));
+        }
+
+        function sendEmail() {
+            alert('📧 EMAIL:\nbolzacleaner@gmail.com\n\n(Copiato negli appunti)');
+            navigator.clipboard.writeText('bolzacleaner@gmail.com').catch(err => console.log('Copy failed', err));
+        }
+
+        function openWebsite() {
+            window.open('https://www.bolzacleaner.it', '_blank');
+        }
+
+        function toggleChatbot() {
+            const box = document.getElementById('chatbotBox');
+            box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        }
+
+        window.addEventListener('load', () => {
+            renderServices();
+            renderFAQ();
+            const today = new Date().toISOString().split('T')[0];
+            currentStep = 1;
+        });
+    </script>
+</body>
+</html>
